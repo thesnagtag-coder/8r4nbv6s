@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafeLife — Grandparent-Proofing · PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════ THEME ENGINE ═══════════ */
+:root {
+  --navy:#0D1B2A; --navy-mid:#1A2F45;
+  --critical:#DC2626; --high:#EA580C; --medium:#D97706; --low:#16A34A;
+  --radius:12px;
+  --shadow:0 2px 12px rgba(13,27,42,0.08);
+  --shadow-lg:0 8px 32px rgba(13,27,42,0.14);
+}
+body[data-theme="terracotta"]  { --accent:#B5642B; --accent-dark:#915022; --accent-rgb:181,100,43; }
+body[data-theme="teal"]   { --accent:#14B8A6; --accent-dark:#0D9488; --accent-rgb:20,184,166; }
+body[data-theme="amber"]  { --accent:#F59E0B; --accent-dark:#D97706; --accent-rgb:245,158,11; }
+body[data-theme="rose"]   { --accent:#E11D48; --accent-dark:#BE123C; --accent-rgb:225,29,72; }
+body[data-theme="violet"] { --accent:#7C3AED; --accent-dark:#6D28D9; --accent-rgb:124,58,237; }
+body[data-theme="ocean"]  { --accent:#2563EB; --accent-dark:#1D4ED8; --accent-rgb:37,99,235; }
+body[data-theme="forest"] { --accent:#16A34A; --accent-dark:#15803D; --accent-rgb:22,163,74; }
+body[data-mode="light"] {
+  --bg:#F9F6F0; --surface:#FFFFFF; --surface-2:#EDE6D6; --tile:#F9F6F0;
+  --ink:#0D1B2A; --ink-mid:#3A4A5C; --ink-soft:#6B7A8D; --line:#EDE6D6;
+  --critical-bg:#FEF2F2; --high-bg:#FFF7ED; --medium-bg:#FFFBEB; --low-bg:#F0FDF4;
+}
+body[data-mode="dark"] {
+  --bg:#0B1420; --surface:#13202F; --surface-2:#1C2C3E; --tile:#0F1A28;
+  --ink:#EDF2F7; --ink-mid:#B7C4D1; --ink-soft:#8194A7; --line:#243549;
+  --critical-bg:rgba(220,38,38,.16); --high-bg:rgba(234,88,12,.16);
+  --medium-bg:rgba(217,119,6,.16); --low-bg:rgba(22,163,74,.16);
+  --shadow:0 2px 12px rgba(0,0,0,0.35); --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s;}
+
+/* ═══════════ TOP BAR ═══════════ */
+.topbar{background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 20px;min-height:58px;position:relative;z-index:300;border-bottom:2px solid var(--accent);flex-wrap:wrap;}
+.topbar-brand{display:flex;align-items:center;gap:12px;}
+.topbar-logo{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;font-family:'Sora',sans-serif;color:#fff;box-shadow:0 2px 8px rgba(var(--accent-rgb),.4);}
+.topbar-name{font-family:'Sora',sans-serif;font-size:17px;font-weight:700;letter-spacing:-.3px;}
+.topbar-name span{color:var(--accent);}
+.topbar-tagline{font-size:11px;color:rgba(255,255,255,.5);font-style:italic;}
+.topbar-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.progress-pill{background:rgba(var(--accent-rgb),.15);border:1px solid rgba(var(--accent-rgb),.3);border-radius:20px;padding:4px 14px;font-size:12px;font-weight:600;color:var(--accent);display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.progress-pill span{color:#fff;font-size:13px;}
+.toolbar{display:flex;gap:6px;flex-wrap:wrap;}
+.tool-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;display:flex;align-items:center;gap:5px;transition:all .2s;position:relative;}
+.tool-btn:hover{background:rgba(var(--accent-rgb),.3);border-color:var(--accent);}
+.tool-btn .tb-label{font-size:11px;}
+@media(max-width:820px){.tool-btn .tb-label{display:none;}.topbar-tagline{display:none;}}
+
+/* ═══════════ DROPDOWN PANELS ═══════════ */
+.dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);padding:10px;display:none;z-index:400;min-width:190px;}
+.dropdown.open{display:block;}
+.dropdown-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--ink-soft);padding:4px 8px 8px;}
+.theme-row{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:none;background:none;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--ink);text-align:left;}
+.theme-row:hover{background:rgba(var(--accent-rgb),.08);}
+.theme-row.selected{background:rgba(var(--accent-rgb),.12);}
+.theme-swatch{width:18px;height:18px;border-radius:6px;flex-shrink:0;}
+.theme-row .check-mark{margin-left:auto;color:var(--accent);font-weight:800;}
+
+/* ═══════════ HERO ═══════════ */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,#3a2703 100%);padding:48px 32px 40px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(var(--accent-rgb),.14) 0%,transparent 60%);}
+.hero-emoji{font-size:64px;line-height:1;margin-bottom:12px;display:block;position:relative;}
+.hero-title{font-family:'Sora',sans-serif;font-size:32px;font-weight:800;color:#fff;margin-bottom:6px;position:relative;}
+.hero-subtitle{font-size:15px;color:rgba(255,255,255,.65);margin-bottom:20px;position:relative;}
+.hero-badges{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;position:relative;}
+.hero-badge{background:rgba(var(--accent-rgb),.15);border:1px solid rgba(var(--accent-rgb),.35);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;color:var(--accent);display:flex;align-items:center;gap:5px;cursor:pointer;transition:background .2s,transform .15s;user-select:none;}
+.hero-badge:hover{background:rgba(var(--accent-rgb),.28);transform:translateY(-1px);}
+
+/* ═══════════ PROGRESS ═══════════ */
+.progress-section{background:var(--surface);border-bottom:1px solid var(--line);padding:0 32px;height:46px;display:flex;align-items:center;gap:20px;position:sticky;top:0;z-index:290;box-shadow:0 2px 8px rgba(13,27,42,.06);}
+.progress-label{font-size:12px;font-weight:600;color:var(--ink-soft);white-space:nowrap;}
+.progress-track{flex:1;height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-dark));border-radius:4px;width:0%;transition:width .4s ease;}
+.progress-count{font-size:13px;font-weight:700;color:var(--accent);white-space:nowrap;}
+.celebrate{display:none;background:linear-gradient(135deg,rgba(var(--accent-rgb),.15),rgba(var(--accent-rgb),.05));border-bottom:1px solid rgba(var(--accent-rgb),.3);padding:14px 32px;text-align:center;font-weight:700;color:var(--accent-dark);font-size:15px;font-family:'Sora',sans-serif;}
+.celebrate.show{display:block;}
+
+/* ═══════════ SEARCH ═══════════ */
+.search-wrap{padding:20px 20px 0;max-width:860px;margin:0 auto;}
+.search-box{width:100%;padding:10px 16px 10px 40px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:14px;font-family:'Inter',sans-serif;color:var(--ink);outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7A8D' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:12px center;transition:border-color .2s;}
+.search-box:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.1);}
+.search-no-results{text-align:center;padding:40px;color:var(--ink-soft);font-size:14px;display:none;}
+
+/* ═══════════ ZONE TABS ═══════════ */
+.zone-tabs{background:var(--surface);border-bottom:2px solid var(--line);display:flex;overflow-x:auto;padding:0 24px;gap:4px;scrollbar-width:none;position:sticky;top:46px;z-index:200;}
+.zone-tabs::-webkit-scrollbar{display:none;}
+.zone-tab{display:flex;align-items:center;gap:7px;padding:14px 18px;border:none;background:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--ink-soft);white-space:nowrap;border-bottom:3px solid transparent;transition:all .2s;margin-bottom:-2px;}
+.zone-tab:hover{color:var(--accent);background:rgba(var(--accent-rgb),.05);}
+.zone-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.zone-tab-count{background:var(--surface-2);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;color:var(--ink-soft);}
+.zone-tab.active .zone-tab-count{background:rgba(var(--accent-rgb),.15);color:var(--accent);}
+
+/* ═══════════ MAIN / STATS ═══════════ */
+.main{max-width:860px;margin:0 auto;padding:28px 20px 60px;}
+.stats-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;user-select:none;}
+.stat-pill:hover{border-color:var(--accent);}
+.stat-pill.filter-on{border-color:var(--accent);background:rgba(var(--accent-rgb),.08);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.15);}
+.stat-dot{width:8px;height:8px;border-radius:50%;}
+.stat-dot.critical{background:var(--critical);}.stat-dot.high{background:var(--high);}.stat-dot.medium{background:var(--medium);}.stat-dot.low{background:var(--low);}
+.stat-count{font-size:15px;font-weight:700;}
+.risk-legend{display:flex;gap:12px;flex-wrap:wrap;margin-left:auto;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--ink-soft);}
+.legend-dot{width:8px;height:8px;border-radius:3px;}
+
+/* ═══════════ ZONE PANEL ═══════════ */
+.zone-panel{display:none;}
+.zone-panel.active{display:block;}
+.zone-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding:20px 24px;background:var(--surface);border-radius:var(--radius);border:1px solid rgba(var(--accent-rgb),.2);box-shadow:var(--shadow);}
+.zone-icon{width:52px;height:52px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.12),rgba(var(--accent-rgb),.06));border:2px solid rgba(var(--accent-rgb),.25);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.zone-header-text h2{font-family:'Sora',sans-serif;font-size:20px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.zone-header-text p{font-size:13px;color:var(--ink-soft);}
+
+/* ═══════════ CHECK CARDS ═══════════ */
+.checks-list{display:flex;flex-direction:column;gap:10px;}
+.check-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden;transition:box-shadow .2s;}
+.check-card:hover{box-shadow:var(--shadow-lg);}
+.check-card.completed{border-color:rgba(var(--accent-rgb),.3);background:rgba(var(--accent-rgb),.03);}
+.check-header{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;user-select:none;}
+.check-checkbox{width:22px;height:22px;min-width:22px;border:2px solid var(--surface-2);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:13px;background:var(--surface);}
+.check-card.completed .check-checkbox{background:var(--accent);border-color:var(--accent);color:#fff;}
+.check-num{font-size:10px;font-weight:700;color:var(--ink-soft);min-width:30px;font-family:'Sora',sans-serif;}
+.check-risk{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+.risk-critical{background:var(--critical-bg);color:var(--critical);}
+.risk-high{background:var(--high-bg);color:var(--high);}
+.risk-medium{background:var(--medium-bg);color:var(--medium);}
+.risk-low{background:var(--low-bg);color:var(--low);}
+.check-title{flex:1;font-size:14px;font-weight:600;color:var(--ink);line-height:1.4;}
+.check-card.completed .check-title{color:var(--ink-soft);text-decoration:line-through;}
+.check-chevron{font-size:12px;color:var(--ink-soft);transition:transform .25s;min-width:16px;}
+.check-card.open .check-chevron{transform:rotate(180deg);}
+.check-detail{display:none;padding:0 18px 18px 18px;border-top:1px solid var(--line);}
+.check-card.open .check-detail{display:block;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+@media(max-width:600px){.detail-grid{grid-template-columns:1fr;}}
+.detail-item{background:var(--tile);border-radius:8px;padding:11px 13px;}
+.detail-item.full{grid-column:1/-1;}
+.detail-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--accent-dark);margin-bottom:4px;display:flex;align-items:center;gap:5px;}
+body[data-mode="dark"] .detail-label{color:var(--accent);}
+.detail-value{font-size:13px;color:var(--ink);line-height:1.55;}
+.tip-box{margin-top:12px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),rgba(var(--accent-rgb),.04));border:1px solid rgba(var(--accent-rgb),.25);border-left:4px solid var(--accent);border-radius:8px;padding:11px 14px;display:flex;gap:10px;align-items:flex-start;}
+.tip-icon{font-size:16px;line-height:1;margin-top:1px;}
+.tip-text{font-size:13px;color:var(--ink);line-height:1.55;}
+.tip-text strong{color:var(--accent-dark);font-weight:700;}
+body[data-mode="dark"] .tip-text strong{color:var(--accent);}
+.measurement-box{margin-top:10px;background:rgba(var(--accent-rgb),.05);border:1px solid var(--line);border-radius:8px;padding:10px 13px;font-size:12px;color:var(--ink-mid);line-height:1.5;font-family:'Sora',sans-serif;}
+.measurement-box strong{color:var(--ink);font-size:11px;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px;}
+
+/* ═══════════ ZONE ACTIONS ═══════════ */
+.zone-actions{display:flex;justify-content:flex-end;gap:10px;margin:14px 0 18px;flex-wrap:wrap;}
+.btn{padding:9px 18px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.btn-outline{background:var(--surface);border:1px solid var(--line);color:var(--ink-mid);}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;box-shadow:0 2px 8px rgba(var(--accent-rgb),.3);}
+.btn-primary:hover{box-shadow:0 4px 16px rgba(var(--accent-rgb),.4);transform:translateY(-1px);}
+
+/* ═══════════ MODALS ═══════════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(13,27,42,.6);z-index:500;display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;backdrop-filter:blur(3px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:16px;max-width:640px;width:100%;box-shadow:var(--shadow-lg);border-top:4px solid var(--accent);}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--line);}
+.modal-head h3{font-family:'Sora',sans-serif;font-size:18px;color:var(--ink);display:flex;align-items:center;gap:8px;}
+.modal-close{background:none;border:none;font-size:22px;color:var(--ink-soft);cursor:pointer;line-height:1;padding:4px;}
+.modal-close:hover{color:var(--accent);}
+.modal-body{padding:20px 24px 26px;color:var(--ink-mid);font-size:13.5px;}
+.modal-body h4{font-family:'Sora',sans-serif;font-size:14px;color:var(--ink);margin:16px 0 6px;display:flex;align-items:center;gap:6px;}
+.modal-body h4:first-child{margin-top:0;}
+.modal-body p{margin-bottom:8px;}
+.modal-body table{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0;}
+.modal-body th{text-align:left;padding:7px 10px;background:rgba(var(--accent-rgb),.1);color:var(--ink);font-size:11px;text-transform:uppercase;letter-spacing:.5px;}
+.modal-body td{padding:7px 10px;border-bottom:1px solid var(--line);color:var(--ink-mid);}
+.modal-body td strong{color:var(--ink);}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;padding:0 24px 22px;flex-wrap:wrap;}
+.rule-list{list-style:none;margin:6px 0;}
+.rule-list li{padding:6px 0 6px 26px;position:relative;border-bottom:1px dashed var(--line);}
+.rule-list li::before{content:'✓';position:absolute;left:2px;color:var(--accent);font-weight:800;}
+
+/* ═══════════ COLLECTION / UPSELL ═══════════ */
+.collection{max-width:860px;margin:0 auto;padding:10px 20px 50px;}
+.collection h3{font-family:'Sora',sans-serif;font-size:18px;color:var(--ink);margin-bottom:4px;}
+.collection>p{font-size:13px;color:var(--ink-soft);margin-bottom:16px;}
+.collection-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;}
+.module-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:4px;transition:all .2s;}
+.module-card:hover{border-color:var(--accent);box-shadow:var(--shadow);}
+.module-card .m-emoji{font-size:26px;}
+.module-card .m-name{font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;color:var(--ink);}
+.module-card .m-age{font-size:11.5px;color:var(--ink-soft);}
+.module-tag{margin-top:6px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-radius:6px;padding:3px 8px;align-self:flex-start;}
+.module-tag.owned{background:rgba(var(--accent-rgb),.15);color:var(--accent-dark);}
+body[data-mode="dark"] .module-tag.owned{color:var(--accent);}
+.module-tag.addon{background:var(--surface-2);color:var(--ink-soft);}
+.module-tag.coming{background:transparent;color:var(--ink-soft);border:1px dashed var(--line);}
+
+/* ═══════════ FOOTER ═══════════ */
+.footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;padding:24px;font-size:12px;line-height:1.8;}
+.footer strong{color:rgba(255,255,255,.8);}
+
+/* ═══════════ TRADEMARK ICON SET ═══════════ */
+.zic svg{width:16px;height:16px;vertical-align:-3px;}
+.zone-tab .zic svg{color:inherit;}
+.topbar-logo svg{width:22px;height:22px;color:#fff;}
+.hero-emoji svg{width:72px;height:72px;color:var(--accent);filter:drop-shadow(0 4px 14px rgba(var(--accent-rgb),.45));}
+.zone-icon svg{width:27px;height:27px;color:var(--accent-dark);}
+body[data-mode="dark"] .zone-icon svg{color:var(--accent);}
+.module-card .m-emoji svg{width:30px;height:30px;color:var(--accent-dark);}
+body[data-mode="dark"] .module-card .m-emoji svg{color:var(--accent);}
+
+/* ═══════════ FLOATING NAV / DISCLAIMERS ═══════════ */
+html{scroll-behavior:smooth;}
+.float-nav{position:fixed;right:16px;bottom:20px;display:flex;flex-direction:column;gap:8px;z-index:250;}
+html[dir="rtl"] .float-nav{right:auto;left:16px;}
+.float-btn{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--accent-dark);font-size:18px;font-weight:800;cursor:pointer;box-shadow:var(--shadow-lg);transition:all .2s;}
+.float-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);transform:translateY(-2px);}
+body[data-mode="dark"] .float-btn{color:var(--accent);}
+.zone-disclaimer{margin-top:18px;padding:10px 14px;border:1px dashed var(--line);border-radius:8px;font-size:11.5px;color:var(--ink-soft);text-align:center;}
+.print-disclaimer{display:none;}
+
+/* ═══════════ PRINT ═══════════ */
+#cheat-print{display:none;}
+@media print{
+  body{background:#fff !important;color:#000;font-size:11px;margin:0 !important;padding:0 !important;}
+  .topbar,.hero,.search-wrap,.zone-tabs,.progress-section,.zone-actions,.stats-bar,.collection,.modal-overlay,.celebrate,.dropdown{display:none !important;}
+  .main{max-width:100%;padding:0 0 30px;}
+  .check-card{box-shadow:none;border:1px solid #ccc;page-break-inside:avoid;margin-bottom:6px;}
+  .check-detail{display:block !important;border-top:1px solid #ddd;}
+  .check-chevron{display:none;}
+  .zone-panel{display:block !important;page-break-before:auto;}
+  .zone-header{box-shadow:none;border:1px solid #ccc;margin-top:14px;}
+  body.print-zone .zone-panel{display:none !important;}
+  body.print-zone .zone-panel.active{display:block !important;}
+  body.print-cheat .main,body.print-cheat .footer,body.print-cheat .zone-panel,body.print-cheat .print-disclaimer{display:none !important;}
+  body.print-cheat #cheat-print{display:block !important;}
+  #cheat-print{margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .cp-card{border:2.5px solid #0D1B2A;border-radius:16px;overflow:hidden;font-family:'Inter',sans-serif;color:#0D1B2A;height:272mm;display:flex;flex-direction:column;page-break-inside:avoid;page-break-after:avoid;}
+  .cp-head{background:#0D1B2A !important;color:#fff;display:flex;align-items:center;gap:12px;padding:13px 22px;}
+  .cp-head svg{width:38px;height:38px;color:var(--accent);}
+  .cp-title{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;line-height:1.2;}
+  .cp-title em{color:var(--accent);font-style:normal;}
+  .cp-sub{font-size:11.5px;color:rgba(255,255,255,.78);margin-top:2px;}
+  .cp-tag{margin-left:auto;font-size:10px;font-style:italic;color:rgba(255,255,255,.65);text-align:right;}
+  .cp-contacts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:11px 22px;background:rgba(var(--accent-rgb),.09) !important;}
+  .cp-chip{border:1.2px solid rgba(var(--accent-rgb),.55);border-radius:8px;padding:5px 9px;background:#fff !important;}
+  .cp-chip b{display:block;font-size:8.5px;text-transform:uppercase;letter-spacing:.3px;color:var(--accent-dark);}
+  .cp-chip span{font-size:12px;font-weight:700;}
+  .cp-cols{display:flex;gap:20px;padding:13px 22px 6px;flex:1;min-height:0;overflow:hidden;}
+  .cp-cols h3{font-family:'Sora',sans-serif;font-size:13px;border-bottom:2px solid var(--accent);padding-bottom:3px;margin:0 0 8px;}
+  .cp-rules{flex:1.15;}
+  .cp-rules ul{list-style:none;margin:0;padding:0;}
+  .cp-rules li{font-size:11px;line-height:1.5;padding:4px 0 4px 18px;position:relative;border-bottom:1px dashed #ddd;}
+  .cp-rules li::before{content:'✓';position:absolute;left:0;color:var(--accent-dark);font-weight:800;}
+  html[dir="rtl"] .cp-rules li{padding:4px 18px 4px 0;}
+  html[dir="rtl"] .cp-rules li::before{left:auto;right:0;}
+  .cp-numsec{flex:1;}
+  .cp-numsec table{width:100%;border-collapse:collapse;font-size:10.5px;}
+  .cp-numsec td{border-bottom:1px solid #eee;padding:4px 5px;vertical-align:top;}
+  .cp-numsec td strong{color:#0D1B2A;}
+  .cp-notes{margin:6px 22px 10px;border:1.5px dashed var(--accent);border-radius:10px;padding:8px 13px;font-size:11px;white-space:pre-wrap;max-height:34mm;overflow:hidden;}
+  .cp-notes b{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent-dark);display:block;margin-bottom:2px;}
+  .cp-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#0D1B2A !important;color:rgba(255,255,255,.85);padding:9px 22px;font-size:10px;line-height:1.55;margin-top:auto;}
+  .cp-foot b{color:var(--accent);}
+  .cp-qr{display:flex;align-items:center;gap:10px;text-align:right;}
+  .cp-qr img{width:68px;height:68px;background:#fff;border-radius:8px;padding:3px;}
+  .cp-qr .qr-ph{width:68px;height:68px;border:1.5px dashed rgba(255,255,255,.5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:8.5px;text-align:center;color:rgba(255,255,255,.6);padding:4px;}
+  .footer{background:#fff;color:#555;}
+  .footer strong{color:#000;}
+  .float-nav{display:none !important;}
+  .print-disclaimer{display:block !important;position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:8.5px;color:#666;border-top:1px solid #ccc;padding:3px 0;background:#fff;}
+  @page{size:A4;margin:10mm 10mm 12mm;}
+}
+</style>
+</head>
+<body data-theme="terracotta" data-mode="light">
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo" id="logo-icon">S</div>
+    <div>
+      <div class="topbar-name">Safe<span>Life</span></div>
+      <div class="topbar-tagline">To all moms by a mom · NEBOSH &amp; OSHA Professional</div>
+    </div>
+  </div>
+  <div class="topbar-meta">
+    <div class="toolbar">
+      <button class="tool-btn" id="btn-search" title="Search all checks">🔍</button>
+      <button class="tool-btn" id="btn-manual" title="User Manual">📖<span class="tb-label" data-i18n="manual">Manual</span></button>
+      <button class="tool-btn" id="btn-cheat" title="Emergency Cheat Sheet">🚨<span class="tb-label" data-i18n="cheat">Cheat Sheet</span></button>
+      <button class="tool-btn" id="btn-print" title="Print / Save as PDF">🖨️<span class="tb-label" data-i18n="printPdf">Print / PDF</span></button>
+      <button class="tool-btn" id="btn-save" title="Save progress to file">💾<span class="tb-label" data-i18n="save">Save</span></button>
+      <button class="tool-btn" id="btn-load" title="Load saved progress">📂<span class="tb-label" data-i18n="load">Load</span></button>
+      <button class="tool-btn" id="btn-lang" title="Language" style="display:none">🌐<span class="tb-label" id="lang-label">EN</span>
+        <div class="dropdown" id="dd-lang"></div>
+      </button>
+      <button class="tool-btn" id="btn-theme" title="Colour theme">🎨<span class="tb-label" data-i18n="theme">Theme</span>
+        <div class="dropdown" id="dd-theme"></div>
+      </button>
+      <button class="tool-btn" id="btn-mode" title="Light / dark mode">🌙</button>
+    </div>
+    <div class="progress-pill"><span id="topbar-done">0</span>&nbsp;/ 84 <span data-i18n="checksDone" style="color:inherit;font-size:12px;">checks done</span></div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-emoji" id="hero-icon">👵</span>
+  <div class="hero-title" data-i18n="heroTitle">Grandparent-Proofing — Ready for Their Visit</div>
+  <div class="hero-subtitle" data-i18n="heroSub">84 evidence-based safety checks across 6 zones · A calm, practical walkthrough before the grandchildren arrive</div>
+  <div class="hero-badges">
+    <div class="hero-badge" data-zone="1"><span class="zic" data-zi="z1"></span> <span data-i18n="bz1">Home Audit</span></div>
+    <div class="hero-badge" data-zone="2"><span class="zic" data-zi="z2"></span> <span data-i18n="bz2">Kitchen &amp; Meals</span></div>
+    <div class="hero-badge" data-zone="3"><span class="zic" data-zi="z3"></span> <span data-i18n="bz3">Sleep &amp; Naps</span></div>
+    <div class="hero-badge" data-zone="4"><span class="zic" data-zi="z4"></span> <span data-i18n="bz4">Medication &amp; Poison</span></div>
+    <div class="hero-badge" data-zone="5"><span class="zic" data-zi="z5"></span> <span data-i18n="bz5">Water &amp; Outdoors</span></div>
+    <div class="hero-badge" data-zone="6"><span class="zic" data-zi="z6"></span> <span data-i18n="bz6">Communication</span></div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-section">
+  <div class="progress-label" data-i18n="overallProgress">Overall Progress</div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="progress-count" id="progress-count">0 of 84</div>
+</div>
+<div class="celebrate" id="celebrate">🎉 <span data-i18n="celebrate">All 84 checks complete — your home is ready for their visit! Print your checklist as a keepsake.</span></div>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <input class="search-box" type="text" id="search-input" placeholder="Search checks… e.g. stair gate, medication, safe sleep, car seat, poison, allergy…">
+</div>
+
+<!-- ZONE TABS -->
+<div class="zone-tabs" id="zone-tabs">
+  <button class="zone-tab active" data-zone="1"><span class="zic" data-zi="z1"></span> <span data-i18n="z1">The Quick-Visit Home Audit</span> <span class="zone-tab-count" id="ztc-1">0/14</span></button>
+  <button class="zone-tab" data-zone="2"><span class="zic" data-zi="z2"></span> <span data-i18n="z2">Kitchen &amp; Mealtime Safety</span> <span class="zone-tab-count" id="ztc-2">0/14</span></button>
+  <button class="zone-tab" data-zone="3"><span class="zic" data-zi="z3"></span> <span data-i18n="z3">Sleeping &amp; Napping Safety</span> <span class="zone-tab-count" id="ztc-3">0/14</span></button>
+  <button class="zone-tab" data-zone="4"><span class="zic" data-zi="z4"></span> <span data-i18n="z4">Medication, Chemicals &amp; Poison Safety</span> <span class="zone-tab-count" id="ztc-4">0/14</span></button>
+  <button class="zone-tab" data-zone="5"><span class="zic" data-zi="z5"></span> <span data-i18n="z5">Supervision, Water &amp; Outdoor Safety</span> <span class="zone-tab-count" id="ztc-5">0/14</span></button>
+  <button class="zone-tab" data-zone="6"><span class="zic" data-zi="z6"></span> <span data-i18n="z6">Communication &amp; Emergency Preparedness</span> <span class="zone-tab-count" id="ztc-6">0/14</span></button>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="main-content">
+  <div class="stats-bar" id="stats-bar">
+    <div class="stat-pill" data-risk="critical"><span class="stat-dot critical"></span><span class="stat-count" id="s-critical">0</span> <span data-i18n="critical">Critical</span></div>
+    <div class="stat-pill" data-risk="high"><span class="stat-dot high"></span><span class="stat-count" id="s-high">0</span> <span data-i18n="high">High</span></div>
+    <div class="stat-pill" data-risk="medium"><span class="stat-dot medium"></span><span class="stat-count" id="s-medium">0</span> <span data-i18n="medium">Medium</span></div>
+    <div class="stat-pill" data-risk="low"><span class="stat-dot low"></span><span class="stat-count" id="s-low">0</span> <span data-i18n="low">Low</span></div>
+    <div class="risk-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--critical)"></div><span data-i18n="legendCritical">Critical = immediate action</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--high)"></div><span data-i18n="legendHigh">High = urgent attention</span></div>
+    </div>
+  </div>
+  <div id="search-no-results" class="search-no-results"><span data-i18n="noResults">No checks match your search. Try different keywords.</span><br><span data-i18n="notCovered" style="font-size:12.5px;"></span></div>
+</div>
+
+<!-- COLLECTION -->
+<div class="collection">
+  <h3 data-i18n="collTitle">The SafeLife Collection</h3>
+  <p data-i18n="collSub">One safety system for every stage of life. Every module below is a complete, standalone 84-check system — available separately, or as the full 12-module bundle.</p>
+  <div class="collection-grid" id="collection-grid"></div>
+</div>
+
+<!-- SITUATION MODULES -->
+<div class="collection" style="padding-top:0;">
+  <h3>Situation Modules</h3>
+  <p>Real-life situations and conditions — each its own complete, standalone 84-check system. Available separately as they launch.</p>
+  <div class="collection-grid" id="situation-grid"></div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <strong>SafeLife</strong> · Grandparent-Proofing Module · PRO Edition<br>
+  Created by a NEBOSH &amp; OSHA trained HSE professional · "To all moms by a mom"<br>
+  Evidence base: WHO safe-sleep guidance · NICE clinical guidance · UN R129 · BS EN safety standards · ISO 8317 child-resistant packaging · international home-safety research<br>
+  <span style="color:rgba(255,255,255,.35);" data-i18n="disclaimer">This checklist is educational general safety guidance. Always use your own judgement, follow the child's parents' instructions, and consult a health professional for any medical concerns.</span>
+</footer>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-manual">
+  <div class="modal">
+    <div class="modal-head"><h3>📖 <span data-i18n="manualTitle">User Manual</span></h3><button class="modal-close" data-close="modal-manual">✕</button></div>
+    <div class="modal-body" id="manual-body"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-cheat">
+  <div class="modal">
+    <div class="modal-head"><h3>🚨 <span data-i18n="cheatTitle">Emergency Cheat Sheet</span></h3><button class="modal-close" data-close="modal-cheat">✕</button></div>
+    <div class="modal-body" id="cheat-body"></div>
+    <div class="modal-actions"><button class="btn btn-outline" id="btn-seller" title="Seller: set this product's QR code" style="margin-right:auto;">⚙</button><button class="btn btn-primary" id="btn-print-cheat" data-i18n="printCheat">🖨️ Print cheat sheet</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-seller">
+  <div class="modal">
+    <div class="modal-head"><h3>⚙ Seller Settings</h3><button class="modal-close" data-close="modal-seller">✕</button></div>
+    <div class="modal-body" id="seller-body"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-print">
+  <div class="modal">
+    <div class="modal-head"><h3>🖨️ <span data-i18n="printTitle">Print or Save as PDF</span></h3><button class="modal-close" data-close="modal-print">✕</button></div>
+    <div class="modal-body">
+      <p data-i18n="printHint">Choose what to print. To save as a PDF instead of printing on paper, choose "Save as PDF" as the printer in the print dialog.</p>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin-top:6px;" data-i18n="printNote">All checks are automatically expanded to full detail when printing — no need to open them first.</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="print-zone" data-i18n="printZone">Current zone only</button>
+      <button class="btn btn-outline" id="print-cheat2" data-i18n="printCheat2">Cheat sheet</button>
+      <button class="btn btn-primary" id="print-all" data-i18n="printAll">Full checklist (all 84)</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="load-file" accept=".json" style="display:none">
+
+<!-- FLOATING CHECK NAVIGATION -->
+<div class="float-nav">
+  <button class="float-btn" id="fn-top" title="Back to top">⤒</button>
+  <button class="float-btn" id="fn-prev" title="Previous check">↑</button>
+  <button class="float-btn" id="fn-next" title="Next check">↓</button>
+</div>
+
+<!-- PRINT PAGE DISCLAIMER (repeats on every printed page) -->
+<div class="print-disclaimer" data-i18n="disclaimer">This checklist is educational general safety guidance. Always use your own judgement, follow the child's parents' instructions, and consult a health professional for any medical concerns.</div>
+
+<div id="cheat-print"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// SELLER BRANDING — edit these three lines to make it yours
+// ═══════════════════════════════════════════
+const BRAND_NAME = 'The Snag Tag';
+const STORE_URL  = '';   // e.g. 'thesnagtag.gumroad.com' — printed under the QR code on the cheat sheet
+const QR_IMAGE   = '';   // paste your QR code as a data URL: 'data:image/png;base64,...'
+
+// ═══════════════════════════════════════════
+// I18N — full interface language packs (check content in English, verified guidance)
+// ═══════════════════════════════════════════
+const I18N = {
+en:{name:'English',manual:'Manual',cheat:'Cheat Sheet',printPdf:'Print / PDF',save:'Save',load:'Load',theme:'Theme',checksDone:'checks done',heroTitle:'Grandparent-Proofing — Ready for Their Visit',heroSub:'84 evidence-based safety checks across 6 zones · A calm, practical walkthrough before the grandchildren arrive',bz1:'Home Audit',bz2:'Kitchen & Meals',bz3:'Sleep & Naps',bz4:'Medication & Poison',bz5:'Water & Outdoors',bz6:'Communication',overallProgress:'Overall Progress',ofWord:'of',z1:'The Quick-Visit Home Audit',z2:'Kitchen & Mealtime Safety',z3:'Sleeping & Napping Safety',z4:'Medication, Chemicals & Poison Safety',z5:'Supervision, Water & Outdoor Safety',z6:'Communication & Emergency Preparedness',zd1:'14 checks: stair gates, blind cords, choking hazards at reach height, hot surfaces, furniture tip-over and a full home audit before they arrive.',zd2:'14 checks: choking foods, highchair safety, allergy communication, cleaning products, and kitchen hazards in a home that isn\'t routinely childproofed.',zd3:'14 checks: safe sleep setup in an unfamiliar space, travel cot safety, soft bedding, and gently updating outdated sleep practices.',zd4:'14 checks: securing your own medications (the single biggest hazard), cleaning products, vitamins, and poison-safety awareness.',zd5:'14 checks: pool and pond hazards, car seat safety, supervision with multiple grandchildren, bath time, and outdoor play.',zd6:'14 checks: pre-visit conversations with parents, emergency contacts, medication permissions, and a confident, prepared close.',critical:'Critical',high:'High',medium:'Medium',low:'Low',legendCritical:'Critical = immediate action',legendHigh:'High = urgent attention',noResults:'No checks match your search. Try different keywords.',searchPh:'Search checks… e.g. stair gate, medication, safe sleep, car seat, poison, allergy…',who:'Who',what:'What',where:'Where',why:'Why',how:'How',standards:'Standards & Measurements',example:'Real-World Example',quickTip:'Quick Win',markAll:'Mark All Complete',unmarkAll:'Unmark All',expandAll:'Expand All',collapseAll:'Collapse All',celebrate:'All 84 checks complete — your home is ready for their visit! Print your checklist as a keepsake.',collTitle:'The SafeLife Collection',collSub:'One safety system for every stage of life. Every module below is a complete, standalone 84-check system — available separately, or as the full 12-module bundle.',owned:'✓ Current Module',addon:'Available Separately',disclaimer:'This checklist is educational general safety guidance. Always use your own judgement, follow the child\'s parents\' instructions, and consult a health professional for any medical concerns.',manualTitle:'User Manual',cheatTitle:'Emergency Cheat Sheet',printTitle:'Print or Save as PDF',printHint:'Choose what to print. To save as a PDF instead of printing on paper, choose "Save as PDF" as the printer in the print dialog.',printZone:'Current zone only',printCheat2:'Cheat sheet',printAll:'Full checklist (all 84)',printCheat:'🖨️ Print cheat sheet',langNote:'Safety check content is written in English (verified international guidance). Interface labels switch language.',saved:'Progress saved',loaded:'Progress loaded',cheatContacts:'My emergency contacts',cheatHint:'Make it yours: edit any name or number, add or delete rows. Everything saves automatically on this device and prints on your cheat sheet.',addContact:'+ Add contact',myNotes:'My notes',notesPh:'Allergies, medication, door codes for babysitters, your address for emergency calls…',rules:'The 10 golden rules',keyNums:'Key measurements at a glance',delRow:'Remove',notCovered:'Topic not covered in this module? Check the cheat sheet, ask your health professional, or request it via your SafeLife store page — new checks arrive in free updates.',printNote:'All checks are automatically expanded to full detail when printing — no need to open them first.',mn1:'Newborn',mn2:'Infant',mn3:'Toddler',mn4:'Preschooler',mn5:'School-Age',mn6:'Teenager',mn7:'Young Adult',mn8:'Adult',mn9:'Middle-Aged Adult',mn10:'Active Seniors',mn11:'Advanced Age',mn12:'90+ and Longevity',
+manualBody:'<h4>🚀 Getting started</h4><p>84 checks in 6 zones. Tap any check to see Who / What / Where / Why / How, exact measurements and standards, a real-world example and a quick-win tip.</p><h4>✅ Progress</h4><p>Tick the box to complete a check — bars and counters update instantly. Each zone has Mark All / Unmark All and Expand / Collapse All buttons, and the floating ↑ ↓ arrows jump between checks.</p><h4>🔍 Search &amp; filters</h4><p>The search box filters all 84 checks live across every zone. Tap a risk pill (Critical / High / Medium / Low) to filter by risk level; tap again to clear.</p><h4>🎨 Personalise</h4><p>Pick a colour theme and light or dark mode — remembered on this device. Make the cheat sheet yours: add your own emergency numbers and notes.</p><h4>💾 Save &amp; 🖨️ Print</h4><p>Progress saves automatically on this device as you go. To move your progress to another device or keep a backup, tap 💾 Save — this downloads a small file. On the new device (or after clearing your browser), open the same checklist, tap 📂 Load, and choose that file to restore your progress exactly where you left off. Keep the file somewhere safe, like your email or a notes app. Print the full checklist, one zone, or your personalised cheat sheet — all checks expand automatically when printing. Choose "Save as PDF" in the print dialog to create a PDF.</p>'}
+};
+
+// ═══════════════════════════════════════════
+// TRADEMARK ICON SET — same outline family as the whole collection
+// ═══════════════════════════════════════════
+const _svg = inner => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">' + inner + '</svg>';
+const ICONS = {
+  stage: _svg('<circle cx="7" cy="5.3" r="2.2"/><path d="M4 19v-3.4a3.4 3.4 0 0 1 3.4-3.4h.6a3.4 3.4 0 0 1 2.6 1.2l1 1.2"/><circle cx="17" cy="9.4" r="1.7"/><path d="M13.9 19v-2.4a2.6 2.6 0 0 1 2.6-2.6h1a2.6 2.6 0 0 1 2.6 2.6V19"/><path d="M9.5 15.3l2.7 1.4"/>'),
+  z1: _svg('<path d="M17.6 3.4a4.4 4.4 0 1 0 2.9 7 5.4 5.4 0 0 1-2.9-7z"/><path d="M3 14.2h18"/><path d="M4.6 14.2v6.3M9.2 14.2v6.3M13.8 14.2v6.3M18.4 14.2v6.3"/>'),
+  z2: _svg('<path d="M4 12.5h16a8 8 0 0 1-16 0z"/><path d="M16.5 12.5l3.2-7"/><path d="M7 9.5c0-1 .8-1.6 1.6-2.1"/>'),
+  z3: _svg('<path d="M4 13h16v1.4a4.6 4.6 0 0 1-4.6 4.6H8.6A4.6 4.6 0 0 1 4 14.4z"/><path d="M6 13V7.2A2.2 2.2 0 0 1 8.2 5h1.3"/><circle cx="14" cy="6" r="1.4"/><circle cx="17.1" cy="8.2" r="1"/><circle cx="15.3" cy="10.3" r="0.7"/><path d="M7 19l-.8 1.7M17 19l.8 1.7"/>'),
+  z4: _svg('<path d="M12 20C6.2 15.7 3.6 12.4 3.6 9.1a4.4 4.4 0 0 1 8.4-1.9 4.4 4.4 0 0 1 8.4 1.9c0 3.3-2.6 6.6-8.4 10.9z"/>'),
+  z5: _svg('<circle cx="12" cy="9" r="5.4"/><path d="M12 14.4V21M12 17l2.6-2.6M5 21h14"/>'),
+  z6: _svg('<path d="M4.5 16v-2.6l1.8-3.8a2 2 0 0 1 1.8-1.2h7.8a2 2 0 0 1 1.8 1.2l1.8 3.8V16"/><circle cx="7.8" cy="16.9" r="1.7"/><circle cx="16.2" cy="16.9" r="1.7"/><path d="M9.5 16.9h5M6.6 12.6h10.8"/>'),
+  stages: [
+    _svg('<circle cx="12" cy="13" r="6.5"/><path d="M12 6.5c0-1.8.8-2.7 2.3-3"/><circle cx="9.7" cy="12.2" r="0.65" fill="currentColor" stroke="none"/><circle cx="14.3" cy="12.2" r="0.65" fill="currentColor" stroke="none"/><path d="M9.9 15c1.4 1.2 2.8 1.2 4.2 0"/>'),
+    _svg('<circle cx="12" cy="7" r="3.2"/><path d="M6.8 20.5v-3.2a5.2 5.2 0 0 1 10.4 0v3.2"/>'),
+    _svg('<path d="M12 3.5l2.5 5.2 5.7.8-4.1 4 1 5.7-5.1-2.7-5.1 2.7 1-5.7-4.1-4 5.7-.8z"/>'),
+    _svg('<rect x="6.5" y="8" width="11" height="12" rx="3"/><path d="M9.5 8V6.2a2.5 2.5 0 0 1 5 0V8"/><rect x="9.7" y="13" width="4.6" height="4" rx="1"/><path d="M6.5 11.5h11"/>'),
+    _svg('<path d="M5 15v-1.5a7 7 0 0 1 14 0V15"/><rect x="4" y="14" width="3.4" height="6" rx="1.6"/><rect x="16.6" y="14" width="3.4" height="6" rx="1.6"/>'),
+    _svg('<path d="M12 4.5L2.8 9l9.2 4.5L21.2 9z"/><path d="M6.8 11.5v3.8c0 1.6 10.4 1.6 10.4 0v-3.8"/><path d="M21.2 9v5"/>'),
+    _svg('<rect x="3.8" y="8" width="16.4" height="11.2" rx="2"/><path d="M9.5 8V6.6A1.6 1.6 0 0 1 11.1 5h1.8a1.6 1.6 0 0 1 1.6 1.6V8M3.8 12.8h16.4"/>'),
+    _svg('<path d="M8.5 9.5v-4c2.3 1.8 4.7 1.8 7 0v4a3.5 3.5 0 0 1-7 0z"/><path d="M12 13v8M12 18c-1.8-.4-3-1.4-3.6-3"/>'),
+    _svg('<circle cx="8.5" cy="5" r="2.1"/><path d="M8.5 7.1c-1.2.4-2 1.5-2 2.8v1.8"/><path d="M8.7 9.6c3.4 0 5.8 2.5 5.8 5.7 0 2.2-1.2 3.9-3 4.9"/><path d="M6.5 11.7v3.4c0 2.2 1 3.9 2.7 5"/>'),
+    _svg('<circle cx="12" cy="5.8" r="2.3"/><path d="M8.2 17.3a3.8 3.8 0 0 1 7.6 0v1.2"/><path d="M6.6 20.5h10.8"/><path d="M8.6 20.5v-3.2M15.4 20.5v-3.2"/><path d="M12 13.4c-.9-.8-1.5-1.3-1.5-1.9a.85.85 0 0 1 1.5-.55.85.85 0 0 1 1.5.55c0 .6-.6 1.1-1.5 1.9z"/>'),
+    _svg('<circle cx="7" cy="5.3" r="2.2"/><path d="M4 19v-3.4a3.4 3.4 0 0 1 3.4-3.4h.6a3.4 3.4 0 0 1 2.6 1.2l1 1.2"/><circle cx="17" cy="9.4" r="1.7"/><path d="M13.9 19v-2.4a2.6 2.6 0 0 1 2.6-2.6h1a2.6 2.6 0 0 1 2.6 2.6V19"/><path d="M9.5 15.3l2.7 1.4"/>')
+  ]
+};
+function injectIcons(){
+  document.getElementById('logo-icon').innerHTML = ICONS.stage;
+  document.getElementById('hero-icon').innerHTML = ICONS.stage;
+  document.querySelectorAll('.zic[data-zi]').forEach(el=>{ el.innerHTML = ICONS[el.dataset.zi] || ''; });
+}
+// ═══════════════════════════════════════════
+// ALL 84 CHECKS — GRANDPARENT-PROOFING
+// ═══════════════════════════════════════════
+const ZONES = [
+  {
+    id: 1, name: 'The Quick-Visit Home Audit', icon: '🏠',
+    desc: '14 checks covering stair gates, blind cords, choking hazards at reach height, hot surfaces, furniture tip-over and a full home audit before they arrive.',
+    checks: [
+      { id:'gp01', num:'GP01', risk:'high', title:'Stairs and Staircases — Gates, Rails and Safe Passage',
+        who:'Grandparents preparing a home for a visiting child who is crawling, cruising, or newly walking',
+        what:'Missing or loose stair gates, unsecured handrails, and stairs a young child can reach unsupervised',
+        where:'Every staircase in the home, including cellar or basement stairs and outdoor steps',
+        why:'Falls on stairs are a leading cause of injury in young children, and a home that has been stair-safe for decades of adult use may have no gates at all. A young visitor does not know which steps are safe.',
+        how:'Fit a temporary pressure-fit or screw-mounted gate certified to a recognised safety standard (BS EN 1930 or equivalent) at the top and bottom of any staircase the child can reach. Check handrails are secure by pushing firmly. Close doors to any stairwell that cannot be gated in time for the visit.',
+        measurement:'BS EN 1930 or equivalent stair-gate standard; gates fitted at top AND bottom; wall-mounted (not pressure-fit) at the top of any flight.',
+        example:'A grandmother\'s home has open-plan stairs she has used safely for thirty years. Her 14-month-old grandson crawls to the third step before anyone notices — a borrowed pressure-fit gate, fitted the morning of the visit, stops him going further.',
+        tip:'Order a stair gate before the first visit, not after a scare — it is a one-time, inexpensive purchase that works for every future visit.' },
+
+      { id:'gp02', num:'GP02', risk:'critical', title:'Blind and Curtain Cord Hazards',
+        who:'Grandparents with older-style blinds, curtains, or looped cords near a cot, sofa, or play area',
+        what:'Looped or dangling blind and curtain cords within reach of a young child, a strangulation hazard',
+        where:'Windows near any spot the child will sleep, sit, or play, including near a travel cot',
+        why:'A looped cord around a young neck can cause strangulation in seconds and is a well-documented, preventable hazard, particularly common in older homes with original window fittings.',
+        how:'Cut any looped cord, fit a cord cleat or tensioning device high on the wall out of reach, or temporarily tie cords up out of reach for the visit. Move any cot, chair, or play mat away from window cords entirely rather than relying on a fix alone.',
+        measurement:'Cords kept permanently out of reach (cleated at least 1.5m/5ft up) or cut to remove any loop; no cords within reach of cots, cribs, or seating.',
+        example:'A travel cot set up for a first overnight visit is placed directly under a window with a looped blind cord — nobody notices until a curious toddler stands and reaches for it during the night.',
+        tip:'Walk every window in the room the child will use and ask "could this loop go around a neck?" — if yes, fix it before the visit, not during it.' },
+
+      { id:'gp03', num:'GP03', risk:'critical', title:'Choking Hazards at a Small Child\'s Eye and Reach Level',
+        who:'Grandparents whose home contains coins, batteries, and small decorative objects at a young child\'s height',
+        what:'Small objects — loose change, button batteries, decorative stones, potpourri, small ornaments — within reach or on low surfaces',
+        where:'Coffee tables, side tables, bowls of decorative items, handbags, and low shelves throughout the home',
+        why:'A grandparent\'s home is often furnished for adult life, not childproofed, and small decorative or everyday objects are a leading cause of choking in young children. Button batteries are especially dangerous if swallowed and can cause serious injury within hours.',
+        how:'Do a low-level sweep of every room the child will access, removing or relocating anything smaller than a standard toilet-roll tube to above 1.5m (5ft). Check remote controls, greeting cards, and novelty items for button batteries and secure the compartment or remove the item.',
+        measurement:'Small-parts choke test: anything that fits through a 3.17cm (1.25 in) diameter tube is a risk for a young child; button batteries kept fully out of reach and inaccessible even if a device is dropped.',
+        example:'A bowl of decorative glass beads on the coffee table, part of the home\'s normal décor for years, is exactly at a crawling 10-month-old\'s reach height during her first visit.',
+        tip:'Get down on your hands and knees at the child\'s actual height before every visit and scan the room from that angle — it reveals hazards standing eye level never shows.' },
+
+      { id:'gp04', num:'GP04', risk:'high', title:'Hot Surfaces — Fireplaces, Radiators and Hot Drinks',
+        who:'Grandparents with an open fire, wood burner, exposed radiator, or the habit of a hot drink left on a low table',
+        what:'Contact burns from hot surfaces and scalds from hot drinks placed within reach',
+        where:'Living rooms with fireplaces or wood burners, rooms with older exposed radiators, and anywhere hot drinks are set down',
+        why:'A young child\'s skin burns at a lower temperature and more quickly than an adult\'s, and grandparents may be used to having a hot drink or an open fire without a young child around to consider.',
+        how:'Fit a fireguard around any open fire, wood burner, or exposed hot radiator for the duration of the visit. Keep hot drinks on high surfaces, never on low tables, and never hold a hot drink while also holding the child.',
+        measurement:'Fireguards fitted to BS 8423 or equivalent for portable fireguards; hot drinks kept above 1m (3.3ft) and away from table edges; scald risk begins around 60°C (140°F) tap or drink temperature.',
+        example:'A grandfather sets his tea on the hearth to cool while getting up to answer the door — his 18-month-old granddaughter reaches it moments later.',
+        tip:'If a fireguard is not yet owned, a temporary barrier of furniture placed several steps back from any fire or exposed radiator works for a single visit.' },
+
+      { id:'gp05', num:'GP05', risk:'high', title:'Furniture Tip-Over Risk',
+        who:'Grandparents with bookshelves, dressers, or side tables not designed with a climbing toddler in mind',
+        what:'Unanchored, freestanding furniture that can tip over if a child climbs, pulls up on, or pulls open drawers',
+        where:'Bedrooms, living rooms, and any room with tall or top-heavy furniture',
+        why:'Furniture tip-over is a genuine and often underestimated hazard — a toddler pulling up on a low drawer or shelf can bring heavy furniture down on themselves, and much older furniture was never designed or tested with this risk in mind.',
+        how:'Anchor tall or freestanding furniture to the wall using an anti-tip strap or bracket, even temporarily for the visit. Remove anything that invites climbing (a TV on an unsecured stand, open shelving at child height) from the child\'s reach.',
+        measurement:'Furniture anchoring per general anti-tip guidance: any unit taller than about 90cm (3ft) or with a top-heavy profile should be secured to a wall stud.',
+        example:'A vintage dresser that has stood safely in the same spot for forty years becomes a serious hazard the first time a grandchild uses its open bottom drawer as a step to climb up.',
+        tip:'Give every tall piece of furniture a firm push test — if it rocks at all, anchor it before the visit rather than after a near-miss.' },
+
+      { id:'gp06', num:'GP06', risk:'medium', title:'Electrical Outlet Covers',
+        who:'Grandparents with standard, unprotected wall sockets throughout the home',
+        what:'Uncovered electrical outlets within reach of a crawling or walking child',
+        where:'All rooms the child will access, particularly low sockets in living rooms and bedrooms',
+        why:'Curious fingers and small objects can be pushed into an uncovered socket, and homes without young children rarely have outlet covers already fitted.',
+        how:'Fit simple, inexpensive socket covers or outlet plugs to any accessible socket before the visit, prioritising rooms where the child will play or sleep unsupervised even briefly.',
+        measurement:'All sockets below approximately 1m (3.3ft) covered or otherwise made inaccessible for the duration of the visit.',
+        example:'A grandson visiting for the first time discovers an uncovered socket behind an armchair within his first hour of exploring the living room.',
+        tip:'A pack of socket covers is one of the cheapest, fastest wins on this whole checklist — fit them once and they stay fitted for every future visit.' },
+
+      { id:'gp07', num:'GP07', risk:'medium', title:'Doorstops and Door-Slam Hazards',
+        who:'Grandparents whose doors do not have finger-safe doorstops or hinge protectors',
+        what:'Doors that can slam or trap small fingers in the hinge side or door edge',
+        where:'Internal doors throughout the home, especially any door with a strong spring or draught that swings shut',
+        why:'Trapped or crushed fingers in a slamming door are one of the most common minor injuries in young children visiting an unfamiliar home, where door weights and draughts differ from what the child is used to.',
+        how:'Fit soft doorstops or hinge-side finger guards to interior doors, and prop open any door with a strong self-closing action for the duration of the visit.',
+        measurement:'Finger-safe doorstop or hinge guard fitted to any door the child regularly passes through; no reliance on the child remembering to be careful.',
+        example:'A door caught by a draught from an open window swings shut on a toddler\'s fingers as she follows her grandfather from room to room.',
+        tip:'Test every door on your own hand first — if it swings shut with any force, it needs a stop or guard before the visit.' },
+
+      { id:'gp08', num:'GP08', risk:'medium', title:'Rugs and Trip Hazards',
+        who:'Grandparents with loose rugs, trailing cables, or raised thresholds throughout the home',
+        what:'Loose-laid rugs, cables, and uneven flooring that a new walker or unsteady toddler can trip over',
+        where:'Hallways, living rooms, and doorway thresholds throughout the home',
+        why:'A newly walking child has an unsteady gait and little ability to catch themselves, and a home furnished for adults for years may have trip hazards nobody notices anymore.',
+        how:'Secure loose rugs with non-slip underlay or double-sided tape, tuck away or tape down trailing cables, and point out raised thresholds to the child and to yourself as you walk the home together.',
+        measurement:'All rugs in main walkways secured with anti-slip backing; cables run along walls rather than across open floor.',
+        example:'A cherished but loose hallway rug that has never been a hazard for adult feet catches a toddler mid-run and sends her into a side table.',
+        tip:'Walk the exact path the child will take between the main rooms and remove or secure every trip hazard along that specific route.' },
+
+      { id:'gp09', num:'GP09', risk:'medium', title:'The Room-by-Room Walkthrough Habit',
+        who:'Grandparents preparing for any visit, whether the first or the fiftieth',
+        what:'Skipping a fresh safety walkthrough because "nothing has changed" since the last visit',
+        where:'Every room the child will access during the stay',
+        why:'Homes change in small ways between visits — a new ornament, a moved plant, a different guest\'s medication left out — and a fresh walkthrough catches what memory alone will miss.',
+        how:'Before every visit, walk each room the child will use and check it against this checklist, even if the last visit went perfectly. Make it a five-minute habit rather than a one-off event.',
+        measurement:'One walkthrough per room, per visit, regardless of how recent the last visit was.',
+        example:'A grandmother who diligently childproofed for the summer visit forgets that a visiting relative left blood-pressure tablets on the hall table over the winter — a fresh walkthrough before the spring visit catches it.',
+        tip:'Keep this checklist somewhere handy — on a fridge, in a drawer near the front door — so the walkthrough habit is easy to repeat every single time.' },
+
+      { id:'gp10', num:'GP10', risk:'medium', title:'Adjusting a Home That Wasn\'t Designed for Young Children',
+        who:'Grandparents whose home has been child-free, or child-grown, for many years',
+        what:'A general mismatch between a home optimised for adult life and the needs of a young visitor',
+        where:'The whole home, considered as a system rather than room by room',
+        why:'A home that has worked perfectly for adult life for decades was never designed with a crawling or climbing child in mind, and that gap is often invisible until you deliberately look for it.',
+        how:'Accept that some temporary changes — gates, covers, relocated items — are normal and not a criticism of your home. Treat the changes as seasonal, like a "child mode" you switch on for visits and off afterwards if you prefer.',
+        measurement:'No fixed measurement — a mindset check rather than a specific number.',
+        example:'A grandfather initially resists "cluttering up" his tidy home with gates and covers, then realises after one near-miss that a temporary, removable setup solves the problem without permanently changing his home.',
+        tip:'Keep a small box of gates, covers and locks specifically for visits — it turns "childproofing" into a five-minute setup rather than a renovation.' },
+
+      { id:'gp11', num:'GP11', risk:'high', title:'Balcony and Deck Railing Gaps',
+        who:'Grandparents with a balcony, deck, or raised terrace with older or wide-set railings',
+        what:'Railing gaps wide enough for a small child to slip through, or low enough to climb over',
+        where:'Balconies, decks, raised patios, and any outdoor area with a drop',
+        why:'Older properties may have railings built to a previous, less protective standard, and a fall from height is one of the most serious outcomes possible from a single unsupervised moment.',
+        how:'Measure railing gaps and, if wider than the safe standard, fit a temporary mesh or barrier for the duration of the visit. Keep any furniture that could be used to climb the railing well away from it, and supervise closely on any balcony or deck regardless of barriers.',
+        measurement:'Maximum safe baluster gap commonly cited as 100mm (4 in); railing height at least 1.1m (3.6ft) for a safe raised area.',
+        example:'A grandmother\'s balcony railing, original to a fifty-year-old apartment, has gaps wide enough for her granddaughter\'s head to fit through — a temporary mesh barrier solves it for the visit.',
+        tip:'If in doubt, treat any balcony or deck as an adult-supervised-only zone rather than relying on the railing alone.' },
+
+      { id:'gp12', num:'GP12', risk:'medium', title:'Garage and Tool Storage',
+        who:'Grandparents with a garage, shed, or workshop accessible from the home',
+        what:'Tools, machinery, and hardware stored at reachable height or behind an unlocked door',
+        where:'Garages, sheds, workshops, and utility areas',
+        why:'A grandparent\'s garage often holds decades of accumulated tools and hardware that were never intended to be near a young child, and these spaces are easy to overlook because they are not "living space."',
+        how:'Lock garage and shed doors for the duration of the visit, or fit a simple hook-and-eye latch above child height if a lock is impractical. Store sharp or heavy tools on high shelves rather than at floor or low-shelf level.',
+        measurement:'Garage/shed access locked or latched above 1.5m (5ft); sharp tools and small hardware stored out of reach.',
+        example:'A curious three-year-old wanders into an unlocked garage during a family barbecue and finds a box of nails and a hand saw within easy reach.',
+        tip:'A simple slide bolt fitted high on the garage door, used only during visits, solves this permanently for very little cost.' },
+
+      { id:'gp13', num:'GP13', risk:'low', title:'Decorative and Fragile Object Placement',
+        who:'Grandparents with breakable ornaments, glassware, or treasured objects on display',
+        what:'Fragile or sharp-edged decorative items within reach, a cut or breakage risk rather than a life-threatening one',
+        where:'Low shelves, coffee tables, and display cabinets throughout the home',
+        why:'While rarely serious, broken glass and fragile ornaments create a real cut risk, and moving treasured items temporarily protects both the child and the item.',
+        how:'Move fragile or breakable items above 1.2m (4ft) for the duration of the visit, or into a room the child will not access. Treat this as protecting the item as much as the child.',
+        measurement:'Fragile items relocated above reach height, or removed from accessible rooms entirely, for the length of the stay.',
+        example:'A treasured glass ornament, safe on a shelf for years, is knocked to the floor by an exploring toddler and breaks into sharp pieces on the carpet.',
+        tip:'A single box or high shelf for "visit-only storage" of fragile favourites protects them every time, with almost no effort.' },
+
+      { id:'gp14', num:'GP14', risk:'low', title:'Get Down to Their Eye Level — The Perspective Check',
+        who:'Every grandparent completing this Quick-Visit Home Audit',
+        what:'A final, whole-home check done from the child\'s actual physical viewpoint rather than an adult\'s',
+        where:'Every room the child will use, viewed at their height',
+        why:'Hazards that are invisible standing up are often obvious kneeling or crawling — cords, small objects, sharp corners and reachable drawers all look different from a toddler\'s-eye view.',
+        how:'As a last step before every visit, get down on your knees or hands and knees in each room and simply look around. Anything that catches your eye at that height is worth a second look.',
+        measurement:'One perspective check per room, performed at the child\'s approximate eye height for their age, as the final step of the audit.',
+        example:'A grandmother who felt confident her living room was ready gets down on her knees and immediately spots a phone charger cable dangling exactly at grabbing height.',
+        tip:'Make the eye-level check your very last step, after all the individual fixes — it is the best way to catch anything the rest of the checklist missed.' }
+    ]
+  },
+  {
+    id: 2, name: 'Kitchen & Mealtime Safety', icon: '🍽️',
+    desc: '14 checks covering choking foods, highchair safety, allergy communication, cleaning products, and kitchen hazards in a home that isn\'t routinely childproofed.',
+    checks: [
+      { id:'gp15', num:'GP15', risk:'critical', title:'Choking Foods Common at a Grandparent\'s Table',
+        who:'Grandparents preparing meals or snacks for a visiting young child',
+        what:'Whole grapes, whole nuts, hard sweets, and other high-choking-risk foods served without modification',
+        where:'Mealtimes and snack times throughout the visit',
+        why:'These foods are classic, well-documented choking hazards for young children, and a grandparent\'s usual snack bowl or fruit bowl may not have been adapted for a young child\'s presence in years.',
+        how:'Cut grapes and similar round fruits into quarters lengthwise, avoid whole nuts and hard sweets for children under the age the parents specify, and check the fruit bowl and snack cupboard before the visit for anything that needs modifying or removing from reach.',
+        measurement:'Round fruits (grapes, cherry tomatoes) quartered lengthwise; whole nuts and hard sweets avoided per parents\' guidance for the child\'s age; food cut no larger than can be swallowed whole.',
+        example:'A bowl of grapes left out for adult guests is exactly what a two-year-old grandchild reaches for first, whole and unquartered.',
+        tip:'Ask the parents directly what foods are and are not appropriate, and quarter round fruits as an automatic habit, every single time, regardless of how confident you feel.' },
+
+      { id:'gp16', num:'GP16', risk:'high', title:'Highchair and Booster Seat Safety',
+        who:'Grandparents using an older, borrowed, or infrequently used highchair or booster seat',
+        what:'A highchair or booster seat that is unstable, missing straps, or not correctly assembled',
+        where:'Kitchen and dining areas at mealtimes',
+        why:'Highchairs kept in storage for years, or borrowed for the visit, may have missing parts, worn straps, or be an older design that no longer meets current safety recommendations.',
+        how:'Check the highchair or booster for a secure five-point harness, a stable base that cannot tip, and correct assembly per its instructions before the first meal of the visit. Retire or avoid any chair missing its straps entirely.',
+        measurement:'Five-point harness preferred; chair base tested for stability by a firm push test; assembly checked against the original instructions if available.',
+        example:'A highchair stored in the attic since the grandchildren\'s parents were small is missing its restraint straps entirely — a temporary strap or a different chair is needed before it is used again.',
+        tip:'If in doubt about an old highchair\'s safety, borrow or buy a current one rather than relying on a decades-old model with unknown wear.' },
+
+      { id:'gp17', num:'GP17', risk:'high', title:'Hot Liquids, Stove and Oven Safety',
+        who:'Grandparents cooking or preparing hot drinks with a young child in the kitchen',
+        what:'Scalds from hot liquids, pan handles, or an accessible oven/hob during meal preparation',
+        where:'The kitchen during cooking and hot-drink preparation',
+        why:'A kitchen is often the busiest, most hazardous room during a visit, and grandparents may be used to cooking without a young child underfoot or reaching up at counter height.',
+        how:'Turn pan handles inward and away from the counter edge, use back burners where possible, and keep the child in a highchair, playpen, or another adult\'s supervision rather than underfoot during active cooking.',
+        measurement:'Pan handles turned inward; hot drinks kept above 1m (3.3ft); oven door guard used if the child can reach the oven front during use.',
+        example:'A grandmother reaching for a pan handle overhanging the counter edge is startled to find her grandson reaching for it at the same moment.',
+        tip:'Treat cooking time as "highchair or playpen time" for the youngest visitors — it removes the busiest hazard window entirely.' },
+
+      { id:'gp18', num:'GP18', risk:'critical', title:'Food Allergy Communication BEFORE the Visit',
+        who:'Grandparents and the child\'s parents, before any meal is prepared',
+        what:'A grandparent unknowingly serving a food the child is allergic to, because the allergy developed or changed since the last visit',
+        where:'This conversation happens before the visit, ideally by phone or message, not discovered at the table',
+        why:'Allergies can develop, change, or be diagnosed between visits, and a grandparent who last cooked for this child months or years ago may be working from outdated information.',
+        how:'Ask the parents directly, every single visit, "has anything changed with allergies, intolerances or new foods to avoid?" — write the answer down and keep it with the visit\'s cheat sheet notes. Check food labels for the specific allergen if one is named.',
+        measurement:'One allergy check confirmed with parents before every visit, recorded in writing, regardless of how long ago the last confirmed list was received.',
+        example:'A grandfather serves a peanut snack his grandson always enjoyed on previous visits, unaware a new allergy was diagnosed only weeks earlier.',
+        tip:'Make "any new allergies since last time?" a standing question you ask before every single visit, not just the first one.' },
+
+      { id:'gp19', num:'GP19', risk:'medium', title:'Safe Snack Storage and Reachability',
+        who:'Grandparents with snacks and treats stored at low, reachable height',
+        what:'Snacks left within reach that may be a choking hazard, contain an allergen, or simply undermine parents\' rules around treats',
+        where:'Kitchen cupboards, fruit bowls, and any low snack storage',
+        why:'A child exploring a new home will often find and try to reach snacks independently, and low, open storage makes it hard to control what and how much they access.',
+        how:'Store snacks — particularly anything that is a choking risk or contains a known allergen — above 1.2m (4ft) or in a cupboard the child cannot open, and offer age-appropriate snacks directly rather than leaving them accessible.',
+        measurement:'Choking-risk or allergen snacks stored above reach height; age-appropriate snacks offered directly rather than left accessible.',
+        example:'A jar of boiled sweets kept at counter height for visiting adults is discovered and opened by an unsupervised toddler within minutes.',
+        tip:'A single high cupboard reserved for "adult snacks" during visits keeps everything simple without banning treats from the home.' },
+
+      { id:'gp20', num:'GP20', risk:'medium', title:'Unfamiliar Kitchen Hazards — A Grandparent\'s Kitchen Isn\'t Childproofed',
+        who:'Grandparents whose kitchen has not been set up with a young child in mind for some time',
+        what:'General kitchen hazards — knife blocks, low cupboards with cleaning products, unsecured bin lids — accumulated over years of adult-only use',
+        where:'The kitchen as a whole, considered fresh each visit',
+        why:'A kitchen safe for decades of adult use accumulates small hazards that only become relevant again when a young child returns, and it is easy to underestimate how much has drifted out of childproofed condition.',
+        how:'Do a specific kitchen walkthrough separate from the general home audit: check knife storage, low cupboard contents, bin accessibility, and any small appliance left plugged in and reachable.',
+        measurement:'Knives stored above 1.2m (4ft) or in a locked drawer; low cupboards checked and cleared or locked; bin lids secure or bin relocated out of reach.',
+        example:'A drawer of kitchen knives at counter-height, never a concern for years of adult cooking, is now within a curious toddler\'s reach for the first time in a decade.',
+        tip:'Treat the kitchen as its own separate checklist — it usually holds more hazards per square metre than any other room in the home.' },
+
+      { id:'gp21', num:'GP21', risk:'critical', title:'Dishwasher Detergent Pods and Cleaning Products',
+        who:'Grandparents using colourful detergent pods or storing cleaning products under the sink',
+        what:'Detergent pods, tablets, and cleaning chemicals that look bright and appealing to a young child and can cause serious chemical injury if bitten or swallowed',
+        where:'Under-sink cupboards, laundry areas, and the dishwasher detergent compartment',
+        why:'Detergent pods are specifically designed to be bright and squeezable, which makes them attractive to a young child, and they can cause serious chemical burns to the mouth and throat if bitten into.',
+        how:'Store all detergent pods and cleaning products above 1.2m (4ft) or in a cupboard with a child safety lock, never under the sink at child height, and load the dishwasher detergent compartment immediately before running the cycle rather than leaving it pre-loaded.',
+        measurement:'All cleaning chemicals and detergent pods stored above 1.2m (4ft) or behind a child-locked cupboard; poison information routed to your cheat sheet, not memorised as a number.',
+        example:'A pack of colourful detergent pods stored in a low cupboard under the sink, exactly as it has been for years, is found and bitten into by a visiting 20-month-old within minutes of exploring the kitchen.',
+        tip:'Relocate cleaning products to a high cupboard permanently, not just during visits — it costs nothing and removes the risk of forgetting before a spontaneous visit.' },
+
+      { id:'gp22', num:'GP22', risk:'medium', title:'Tablecloth-Pulling Hazard',
+        who:'Grandparents who use a tablecloth or table runner for meals',
+        what:'A young child pulling a tablecloth and bringing hot food, hot drinks, or breakable items down on themselves',
+        where:'Dining tables and any surface with a hanging cloth within a child\'s reach',
+        why:'A toddler pulling up to standing will often grab whatever is at hand height, and a tablecloth with items on top can bring everything down at once, including anything hot.',
+        how:'Remove tablecloths and runners for the duration of the visit, or ensure nothing hot, heavy, or breakable is placed on any cloth the child can reach and pull.',
+        measurement:'No hanging tablecloth within reach when the table holds hot food, hot drinks, or breakable items during the visit.',
+        example:'A tablecloth pulled by a standing 13-month-old brings a hot teapot and a jug of milk down onto the floor beside her.',
+        tip:'Simplest fix: skip the tablecloth entirely during visits with young children, and use place mats instead.' },
+
+      { id:'gp23', num:'GP23', risk:'high', title:'Highchair Strap Use — Every Time',
+        who:'Grandparents who may be tempted to skip the highchair strap for "just a quick snack"',
+        what:'A child left unstrapped in a highchair, at risk of standing, climbing, or falling from height',
+        where:'Every use of the highchair, however brief',
+        why:'Falls from highchairs are common precisely because adults judge a "quick" use as low risk — a child can stand and topple in seconds, and the fall is from a genuine height.',
+        how:'Use the full harness every single time the child is in the highchair, regardless of how short the sitting is expected to be, and never leave the child unattended in it even while strapped.',
+        measurement:'Five-point or three-point harness used on 100% of highchair uses, with no exceptions for short sittings.',
+        example:'A grandfather sits his granddaughter in the highchair "just for a minute" without strapping her in while he fetches a bib — she stands and falls before he returns.',
+        tip:'Make strapping in a fixed habit tied to the chair itself, not a judgement call made fresh each time — the chair goes in, the straps go on, no exceptions.' },
+
+      { id:'gp24', num:'GP24', risk:'medium', title:'Safe Seating During Meals',
+        who:'Grandparents seating a young child at the table without a highchair, such as an older toddler',
+        what:'A child seated on a regular chair, cushion stack, or adult\'s lap in a way that risks falling or reaching hot food',
+        where:'Dining table seating arrangements throughout the visit',
+        why:'Older toddlers who have outgrown a highchair still need secure, stable seating — a wobbly cushion stack or a chair too far from the table encourages standing, climbing or overreaching.',
+        how:'Use a securely fitted booster seat with a strap for a child too big for a highchair but not yet safely seated on an adult chair alone, and position seating away from hot serving dishes and table edges.',
+        measurement:'Booster seat secured to the chair per manufacturer instructions; seating positioned at least 30cm (12 in) from any hot serving dish.',
+        example:'A three-year-old perched on a stack of cushions overbalances reaching for a serving spoon on the far side of the table.',
+        tip:'A simple, strapped booster seat is a small investment that removes this whole category of risk for years of family meals.' },
+
+      { id:'gp25', num:'GP25', risk:'medium', title:'Water Temperature for Handwashing',
+        who:'Grandparents whose water heater or taps run hotter than a young child\'s skin can safely tolerate',
+        what:'Handwashing or washing-up water hot enough to scald a young child\'s more sensitive skin',
+        where:'Kitchen and bathroom taps used before and after meals',
+        why:'A young child\'s skin burns more quickly and at a lower temperature than an adult\'s, and older water heating systems may not have a thermostatic mixing valve limiting maximum tap temperature.',
+        how:'Check the water temperature yourself before letting the child\'s hands under the tap, or run cold first and adjust gradually rather than starting on hot.',
+        measurement:'Safe handwashing water temperature commonly cited as no higher than 37–38°C (98.6–100.4°F) for a young child; water above 49°C (120°F) can scald within seconds.',
+        example:'A grandmother runs the hot tap for handwashing before a meal, forgetting her hot water system runs noticeably hotter than her daughter\'s home.',
+        tip:'If you\'re not sure of your tap\'s maximum temperature, test it on your own wrist first before letting a child\'s hands near it.' },
+
+      { id:'gp26', num:'GP26', risk:'medium', title:'Supervision During Meal Preparation',
+        who:'Grandparents cooking or preparing a meal with a young child in or near the kitchen',
+        what:'A young child left unsupervised in a kitchen during active food preparation',
+        where:'The kitchen during any cooking, chopping, or hot-liquid activity',
+        why:'Meal preparation concentrates several hazards at once — heat, sharp tools, and reaching hands — and a moment\'s distraction is when most kitchen incidents happen.',
+        how:'Use a highchair, playpen, or a second adult to supervise the child during active cooking, or pause cooking activities that involve heat or sharp tools if you are the only supervising adult.',
+        measurement:'No child left unsupervised in a kitchen during active cooking; a second point of supervision (highchair, playpen, other adult) used whenever the grandparent is cooking alone.',
+        example:'A grandmother chopping vegetables looks away for a moment to answer a question and does not notice her grandson has pulled open a low cupboard behind her.',
+        tip:'If you\'re cooking solo, do your prep work before the child is in the kitchen, and keep active hob or knife work to moments when another adult has the child.' },
+
+      { id:'gp27', num:'GP27', risk:'medium', title:'Safe Placement of Small Kitchen Appliances',
+        who:'Grandparents with kettles, toasters, or other small appliances at counter edge or with dangling cords',
+        what:'Appliances or cords positioned where a reaching or pulling child could bring them down',
+        where:'Kitchen counters and any surface with small appliances',
+        why:'A kettle or toaster pulled down by a dangling cord can cause serious scalds or burns, and appliance placement that has been fine for years of adult use may not account for a reaching toddler.',
+        how:'Move small appliances back from counter edges, coil or tie up dangling cords, and unplug appliances not in active use during the visit.',
+        measurement:'Appliances and cords kept at least 20cm (8 in) back from any counter edge a child could reach or pull from below.',
+        example:'A kettle cord dangling over the counter edge is pulled by a standing 11-month-old, bringing the (thankfully cooled) kettle down beside him.',
+        tip:'A cord-wind or cord clip on your kettle and toaster is a one-time fix that removes this hazard for good.' },
+
+      { id:'gp28', num:'GP28', risk:'medium', title:'Communicating Dietary Restrictions',
+        who:'Grandparents preparing food for a child with any dietary restriction beyond allergies — religious, cultural, vegetarian, or medically advised',
+        what:'Feeding a child something outside the parents\' chosen dietary rules, even without an allergy involved',
+        where:'Any meal or snack prepared during the visit',
+        why:'Dietary choices matter to parents for many reasons beyond allergy, and respecting them is both a safety and a trust issue — a grandparent who feeds against these wishes, even with good intentions, can create real conflict and, in some cases, genuine health concerns.',
+        how:'Ask parents directly about any dietary restrictions before the visit, alongside the allergy question, and keep a simple written note of what is and is not offered.',
+        measurement:'One dietary-restrictions confirmation per visit, recorded alongside the allergy check.',
+        example:'A grandmother offers a family recipe containing an ingredient the parents avoid for religious reasons, unaware of the household\'s specific practice.',
+        tip:'Combine the allergy question and the dietary-restrictions question into one simple conversation before every visit — it takes two minutes and prevents most mealtime surprises.' }
+    ]
+  },
+  {
+    id: 3, name: 'Sleeping & Napping Safety', icon: '🛏️',
+    desc: '14 checks covering safe sleep setup in an unfamiliar space, travel cot safety, soft bedding, and gently updating outdated sleep practices.',
+    checks: [
+      { id:'gp29', num:'GP29', risk:'critical', title:'Safe Sleep Setup in an Unfamiliar Space — Guidance Has Changed, and That\'s OK',
+        who:'Grandparents setting up a sleep space for an infant or young child, often for the first time in decades',
+        what:'A sleep setup that reflects how the grandparent raised their own children rather than current safe-sleep guidance',
+        where:'Any room where the child will nap or sleep overnight',
+        why:'Safe-sleep guidance has changed meaningfully since most grandparents raised their own children — not because earlier practice was careless, but because research has moved on. Following current guidance is one of the most protective things you can do, and it takes nothing away from the excellent job you did raising your own children under the best knowledge available at the time.',
+        how:'For any infant, use a firm, flat, bare sleep surface with no pillows, soft toys, bumpers, or loose blankets, and place them on their back to sleep, per current WHO/NICE-aligned safe-sleep guidance. Ask the parents directly what setup they use at home and match it as closely as possible.',
+        measurement:'Back-to-sleep position; firm flat surface; bare cot/crib per current international safe-sleep guidance (WHO/NICE-aligned); no loose bedding, bumpers or soft toys in the sleep space.',
+        example:'A grandmother who always used a soft quilt and a favourite stuffed toy for her own children learns that current guidance recommends a completely bare sleep space, and updates her spare room setup accordingly for her granddaughter\'s visits.',
+        tip:'Guidance changing is a sign that knowledge has improved, not that anything was done wrong before — treat updated safe-sleep advice as a gift, not a criticism.' },
+
+      { id:'gp30', num:'GP30', risk:'high', title:'Travel Cot and Crib Safety and Correct Assembly',
+        who:'Grandparents using a travel cot, crib, or Moses basket for an overnight visit',
+        what:'Incorrect assembly, a missing or incompatible mattress, or an older travel cot that no longer meets current standards',
+        where:'Wherever the travel cot or crib is set up for sleep',
+        why:'Travel cots are only as safe as their assembly and the mattress fitted to them — an incorrect setup or a mismatched mattress introduces gaps and instability that are not present when the equipment is used correctly.',
+        how:'Assemble the travel cot exactly per its instructions, checking every locking mechanism clicks fully into place, and use only the mattress designed for that specific cot, checked for a snug fit with no gaps at the edges.',
+        measurement:'Mattress gap no greater than two finger-widths (approximately 2.5cm/1 in) at any edge; all locking mechanisms confirmed engaged before use; cot checked against a recognised standard (e.g. BS EN 716 or equivalent) if purchasing new.',
+        example:'A borrowed travel cot is set up quickly the night of the visit with a mattress slightly too small, leaving a gap at one side that goes unnoticed until the next morning.',
+        tip:'Do a "test assembly" of any travel cot before the visit day, not on the night itself, so any missing parts or fit problems are caught with time to fix them.' },
+
+      { id:'gp31', num:'GP31', risk:'critical', title:'Soft Bedding, Pillows and Blankets — Keep the Sleep Space Bare',
+        who:'Grandparents used to a cosy-looking cot or bed setup with pillows, quilts, and soft toys',
+        what:'Loose soft bedding, pillows, quilts, cot bumpers, or soft toys placed in an infant\'s sleep space',
+        where:'Any cot, crib, or bed used by an infant during the visit',
+        why:'Loose soft items in a sleep space are a recognised suffocation and overheating risk for infants, and a setup that looks warm and inviting to an adult eye is exactly the setup current guidance advises against.',
+        how:'Use only a fitted sheet on a firm mattress for an infant\'s sleep space — no pillow, no loose blanket, no bumper, no soft toy — and use a sleep bag or swaddle appropriate to the child\'s age instead of a loose blanket if extra warmth is needed.',
+        measurement:'Bare sleep space per current guidance: fitted sheet only; sleep bag/swaddle for warmth instead of loose blankets; no pillows, bumpers or soft toys for infants under 12 months.',
+        example:'A beautifully decorated travel cot, set up with a soft quilt and a favourite teddy to make a grandchild\'s first overnight visit feel special, is exactly the setup current guidance recommends avoiding.',
+        tip:'Save the soft toys and blankets for daytime cuddles and photos — keep the actual sleep space completely bare, every single night.' },
+
+      { id:'gp32', num:'GP32', risk:'medium', title:'Room Temperature for Sleep',
+        who:'Grandparents whose home heating habits may run warmer or cooler than current infant-sleep guidance',
+        what:'A sleep room that is too warm or too cold for safe, comfortable infant sleep',
+        where:'The bedroom or room used for napping and overnight sleep',
+        why:'Overheating is a recognised risk factor in infant sleep safety, and a grandparent\'s normal home temperature preference may not match what is appropriate for an infant\'s sleep room.',
+        how:'Aim for a comfortably cool room rather than a warm one, dress the child in appropriate layers for the room temperature rather than adding blankets, and avoid placing the cot near a radiator, heater, or direct sun.',
+        measurement:'Recommended infant sleep room temperature commonly cited as 16–20°C (61–68°F).',
+        example:'A grandfather, feeling the cold himself, turns the heating up higher than usual for his granddaughter\'s visit, unaware this pushes her sleep room above the comfortable range.',
+        tip:'A simple room thermometer in the sleep room removes the guesswork entirely — check it once before bedtime.' },
+
+      { id:'gp33', num:'GP33', risk:'medium', title:'Safe Overnight Supervision Basics',
+        who:'Grandparents caring for an infant or young child overnight',
+        what:'General overnight supervision — knowing when to check on the child and how to respond to waking',
+        where:'Wherever the child sleeps overnight during the stay',
+        why:'Overnight supervision in an unfamiliar home differs from a parent\'s usual routine, and a grandparent may be less attuned to a young child\'s particular sleep sounds and patterns.',
+        how:'Keep a baby monitor or the bedroom door open if the child sleeps in a separate room, and ask parents in advance what their usual overnight-waking routine looks like so you are not guessing at 2am.',
+        measurement:'One clear overnight-routine conversation with parents before the visit begins; monitor or audible access to the sleep space throughout the night.',
+        example:'A grandmother unfamiliar with her grandson\'s usual settling routine is unsure whether his overnight crying is normal or something to check on more closely.',
+        tip:'Ask parents to write down their child\'s usual overnight routine and any settling techniques as part of the pre-visit conversation — it removes most of the guesswork.' },
+
+      { id:'gp34', num:'GP34', risk:'medium', title:'Communicating the Parents\' Actual Sleep Routine',
+        who:'Grandparents and the child\'s parents, before any overnight stay',
+        what:'A mismatch between the grandparent\'s own habits and the specific routine the parents currently use',
+        where:'This conversation happens before the visit, covering naps and bedtime alike',
+        why:'Sleep routines and rules — nap timing, bedtime, comfort objects allowed, how settling is handled — are often specific and change over time, and following them supports both safety and the child\'s comfort in an unfamiliar place.',
+        how:'Ask parents to describe their child\'s current nap and bedtime routine in detail, including timing, any comfort items used, and how they prefer settling to be handled, and follow it as closely as practical.',
+        measurement:'One documented routine conversation per visit, covering nap timing, bedtime, and settling preferences.',
+        example:'A grandmother who put her own children down with a bottle at bedtime is unaware her granddaughter\'s parents use a no-bottle-in-bed rule for dental safety reasons.',
+        tip:'A short written note from the parents — even a few lines by message — is enough to keep everyone aligned without relying on memory.' },
+
+      { id:'gp35', num:'GP35', risk:'high', title:'Safe Location for a Nap — Not the Adult Bed or Sofa',
+        who:'Grandparents tempted to let an infant nap on an adult bed or sofa "just for a minute"',
+        what:'An infant sleeping unsupervised on an adult bed, sofa, or armchair, all recognised higher-risk sleep surfaces',
+        where:'Living rooms and adult bedrooms during daytime napping',
+        why:'Adult beds and sofas carry a higher risk of suffocation and falls for an unsupervised infant than a firm, flat cot or crib, regardless of how carefully cushions are arranged.',
+        how:'Always use a proper cot, crib, or travel cot for infant naps, even short ones, and never leave an infant to nap unsupervised on an adult bed, sofa, or armchair.',
+        measurement:'100% of infant naps on a firm, flat, dedicated sleep surface — no exceptions for "just a quick nap."',
+        example:'A grandfather lets his sleepy granddaughter nap on the sofa while he watches from the next room "just for a few minutes" — she rolls toward the cushioned back before he returns.',
+        tip:'If a travel cot isn\'t set up yet when the child gets sleepy, hold the child rather than placing them on an adult surface until the proper sleep space is ready.' },
+
+      { id:'gp36', num:'GP36', risk:'medium', title:'Monitoring During Sleep',
+        who:'Grandparents caring for an infant or young child during naps and overnight sleep',
+        what:'A lack of any way to check on the sleeping child from another room',
+        where:'Wherever the child sleeps, if out of direct sight or hearing',
+        why:'Being able to check on a sleeping child without constant hovering supports both safety and a restful visit for everyone, particularly in an unfamiliar home where sounds and layouts differ.',
+        how:'Use a video or audio baby monitor if available, or keep the door open and check in periodically if not, particularly for the first few naps in an unfamiliar room.',
+        measurement:'Checks at reasonable intervals appropriate to the child\'s age, or continuous monitor coverage if used.',
+        example:'A grandmother without a monitor checks on her sleeping grandson only once in two hours during his first nap in her home, missing that he had woken and was standing at the cot rail.',
+        tip:'A simple, inexpensive audio monitor is a worthwhile purchase if overnight grandchild visits are a regular occurrence.' },
+
+      { id:'gp37', num:'GP37', risk:'medium', title:'Transitioning Between Cribs and Travel Cots',
+        who:'Grandparents whose grandchild sleeps in a different cot or crib type at home than the one provided for the visit',
+        what:'A child unsettled or confused by an unfamiliar sleep surface, texture, or height',
+        where:'The sleep space used for the visit, compared with the child\'s usual setup at home',
+        why:'A different sleep surface can disrupt settling and sleep quality, and understanding the child\'s usual setup helps recreate a closer match, supporting both comfort and safety.',
+        how:'Ask parents what the child\'s usual cot or crib looks and feels like, and try to match firmness, height, and general setup as closely as the available equipment allows.',
+        measurement:'One comparison conversation with parents about the child\'s usual sleep surface before the visit.',
+        example:'A toddler used to a low floor-level toddler bed at home is unsettled by a much higher travel cot with rigid mesh sides during her first stay with her grandparents.',
+        tip:'If the available equipment is very different from what the child is used to, a few practice naps in it before an overnight stay can help the transition go more smoothly.' },
+
+      { id:'gp38', num:'GP38', risk:'high', title:'Gently Updating Outdated Sleep Practices',
+        who:'Grandparents whose own child-rearing included practices no longer recommended, such as tummy sleeping or cot bumpers',
+        what:'Continuing a practice that was standard advice decades ago but is no longer recommended under current guidance',
+        where:'Any sleep setup during the visit',
+        why:'Tummy sleeping and cot bumpers were common, well-intentioned practice in earlier decades — current guidance has moved away from both based on research that has emerged since. This is about updated evidence, not about anything having been done wrong before.',
+        how:'Follow current back-to-sleep positioning and a bumper-free cot for any infant in your care, even if this differs from how you raised your own children, and feel free to ask the parents or your health professional to explain the current reasoning if it helps.',
+        measurement:'Back-sleeping position and bumper-free cot per current international safe-sleep guidance, regardless of past personal practice.',
+        example:'A grandfather who always placed his own children on their tummies to sleep, following the standard advice of his era, updates his approach for his grandchildren once he understands current guidance and the research behind it.',
+        tip:'If a practice feels unfamiliar or even in one\'s view "the old way was fine," remember that guidance changes because of new evidence, not because anyone did anything wrong — updating it is simply good, current care.' },
+
+      { id:'gp39', num:'GP39', risk:'medium', title:'General Room Safety Check Before Naptime',
+        who:'Grandparents preparing a room for a nap or overnight sleep',
+        what:'A quick safety check of the specific sleep room, separate from the general home audit',
+        where:'The room used for the child\'s sleep during the visit',
+        why:'A sleep room needs its own final check — cords, blind cords, temperature, and clear floor space — even after the general home audit has been completed.',
+        how:'Before each nap or bedtime, quickly check the specific room: cot assembled correctly, no cords or hazards nearby, temperature comfortable, and floor clear if the child will be put down awake.',
+        measurement:'One room-specific check per sleep session, in addition to the general home audit.',
+        example:'A grandmother who audited the whole home in the morning forgets that a phone charger was later plugged in near the cot during the afternoon, only noticing at the final bedtime check.',
+        tip:'Make the sleep-room check the very last thing you do before settling the child, so nothing from earlier in the day has quietly changed the room.' },
+
+      { id:'gp40', num:'GP40', risk:'medium', title:'Temperature and Clothing Layers for Sleep',
+        who:'Grandparents dressing a child for sleep in an unfamiliar home',
+        what:'A child overdressed or underdressed for the actual room temperature during sleep',
+        where:'Wherever the child sleeps during the visit',
+        why:'Overheating is a recognised risk factor in infant sleep, and a grandparent\'s own sense of "warm enough" may not match the specific room\'s temperature on any given night.',
+        how:'Dress the child in one layer more than an adult would find comfortable in the same room, check the back of their neck or chest (not hands or feet) for warmth, and adjust bedding weight or clothing rather than heating the room excessively.',
+        measurement:'Comfortable warmth check via chest/back of neck (not cold, not sweaty); one layer more than adult comfort as a general guide.',
+        example:'A grandmother, feeling the visit\'s spare room was chilly, adds a heavy blanket and a warm sleepsuit together, unintentionally overdressing her grandson for the actual room temperature.',
+        tip:'Check warmth at the chest or the back of the neck, not the hands or feet, which are normally cooler and not a reliable guide.' },
+
+      { id:'gp41', num:'GP41', risk:'medium', title:'Safe Use of Borrowed Sleep Equipment',
+        who:'Grandparents using a cot, crib, or travel cot borrowed from family or friends rather than bought new',
+        what:'Borrowed sleep equipment of unknown age, missing parts, or recalled design',
+        where:'Wherever borrowed sleep equipment is set up for the visit',
+        why:'Older or borrowed cots may predate current safety standards, be missing original parts, or have been subject to a safety recall the current owner is unaware of.',
+        how:'Check any borrowed cot or travel cot against its original instructions if available, inspect for missing or damaged parts, and check the model against any relevant safety recall notices before first use.',
+        measurement:'Borrowed equipment checked for completeness, correct assembly, and recall status before its first use with the child.',
+        example:'A travel cot borrowed from a neighbour turns out to be missing a locking clip that a manufacturer recalled the model for years earlier, unknown to the current owner.',
+        tip:'If you cannot verify a borrowed cot\'s completeness or safety history, it is worth buying a current, standard-compliant travel cot instead — a one-time cost for repeated peace of mind.' },
+
+      { id:'gp42', num:'GP42', risk:'high', title:'Communicating Special Sleep Needs',
+        who:'Grandparents and parents of a child with reflux, a health condition, or another specific sleep-related need',
+        what:'Missing important, individual guidance about a child\'s specific sleep needs, such as an elevated position for reflux or a particular monitoring need',
+        where:'This conversation happens before any overnight stay',
+        why:'Some children have individual medical guidance around their sleep position or monitoring that a general checklist cannot anticipate, and this always takes precedence over general advice.',
+        how:'Ask parents directly whether the child has any specific sleep-related health need, and follow their (and their health professional\'s) individualised guidance exactly, even where it differs from the general guidance in this checklist.',
+        measurement:'Individualised medical guidance always takes precedence over general sleep guidance; confirmed in writing with parents before any overnight stay involving a child with a known condition.',
+        example:'A grandmother is unaware her grandson\'s reflux management includes a specific, doctor-recommended sleep positioning approach until the parents mention it explicitly before an overnight stay.',
+        tip:'Ask "is there anything specific about sleep I need to know for this visit?" as a standing question — it opens the door for parents to mention anything a general checklist would miss.' }
+    ]
+  },
+  {
+    id: 4, name: 'Medication, Chemicals & Poison Safety', icon: '💊',
+    desc: '14 checks covering securing your own medications (the single biggest hazard), cleaning products, vitamins, and poison-safety awareness.',
+    checks: [
+      { id:'gp43', num:'GP43', risk:'critical', title:'Securing Your Own Medications — The Single Biggest Hazard in a Grandparent\'s Home',
+        who:'Grandparents who take regular medication themselves',
+        what:'Personal medications left within reach on a kitchen counter, bedside table, or handbag, often in easy-open containers',
+        where:'Kitchens, bedrooms, bathrooms, and handbags throughout the home',
+        why:'Older adults typically take more regular medications than younger households, often kept close at hand for convenience, in containers not designed to be child-resistant — this is consistently one of the single biggest medication-related hazards in a grandparent\'s home.',
+        how:'Store all personal medications in their original containers in a locked cabinet, high cupboard, or a lockable box, well above 1.5m (5ft) and out of any handbag left within a child\'s reach. Take your own doses somewhere the child cannot follow or reach the container.',
+        measurement:'All personal medications locked or stored above 1.5m (5ft); handbags and coat pockets containing medication kept off the floor and out of reach during the visit.',
+        example:'A grandmother\'s daily blood-pressure tablets, kept in a weekly organiser on the kitchen counter for convenience, are found and opened by her curious two-year-old granddaughter while she answers the phone.',
+        tip:'Before every visit, do a specific "my own medications" check separate from the general home audit — it is consistently the highest-risk item in this whole checklist.' },
+
+      { id:'gp44', num:'GP44', risk:'critical', title:'Securing Other Household Members\' Medications',
+        who:'Grandparents living with, or regularly visited by, another adult who also takes medication',
+        what:'A partner\'s, housemate\'s, or visitor\'s medication left accessible, outside the grandparent\'s own awareness or control',
+        where:'Anywhere another household member keeps their medication',
+        why:'It is easy to focus only on your own medications and overlook a partner\'s or visitor\'s, especially if storage habits differ between people in the same home.',
+        how:'Have the same conversation with any other adult in the household about securing their medication for the visit, and check shared spaces (bathroom cabinets, shared bedside tables) as part of your walkthrough, not just your own.',
+        measurement:'Every adult medication source in the home checked and secured, not only the grandparent\'s own.',
+        example:'A grandfather secures his own tablets carefully but is unaware his visiting brother has left a course of antibiotics on the guest room nightstand.',
+        tip:'Make the medication check a whole-household conversation before any visit with young children, not a solo task.' },
+
+      { id:'gp45', num:'GP45', risk:'high', title:'Poison Information Awareness',
+        who:'Every grandparent caring for a young child',
+        what:'Not knowing where to find poison or ingestion advice quickly if something is swallowed',
+        where:'Anywhere in the home, at any time during the visit',
+        why:'Fast, correct information in the first minutes after a suspected poisoning matters, and this checklist deliberately does not print a number here — local poison information services vary by location and change over time.',
+        how:'Before the visit, find your local poison information or emergency medical advice service and save its number in your personalised cheat sheet, so it is instantly available rather than searched for in a moment of stress.',
+        measurement:'One saved, current poison-information contact in the cheat sheet before every visit; no reliance on memory or an old, potentially outdated number.',
+        example:'A grandmother searching online for a poison information number during a stressful moment loses valuable minutes she would not have lost with the number already saved.',
+        tip:'Save this number now, before you need it — it takes two minutes and could matter enormously later.' },
+
+      { id:'gp46', num:'GP46', risk:'critical', title:'Cleaning Product Storage and Childproof Placement',
+        who:'Grandparents storing cleaning products under the sink or in a low utility cupboard',
+        what:'Cleaning chemicals within reach, some in containers that look similar to drinks or food',
+        where:'Under-sink cupboards, laundry rooms, and utility cupboards',
+        why:'Household cleaning chemicals can cause serious injury if swallowed or splashed in the eyes, and low storage that has never been a problem for adults becomes an immediate hazard the moment a young child can open the cupboard.',
+        how:'Move cleaning products to a high cupboard or a low cupboard fitted with a child safety catch, and never transfer any chemical into an unlabelled or drink-like container.',
+        measurement:'All cleaning chemicals stored above 1.2m (4ft) or behind a child-locked cupboard; no chemicals in unlabelled containers.',
+        example:'A bottle of concentrated cleaner kept under the kitchen sink for years, exactly where it has always been, is found and opened by a grandchild exploring low cupboards for the first time.',
+        tip:'A simple child safety catch on the under-sink cupboard door is a five-minute fix that solves this permanently.' },
+
+      { id:'gp47', num:'GP47', risk:'high', title:'Reading-Glasses and Pill Mix-Up Risk',
+        who:'Grandparents who keep reading glasses, pill organisers, and small items in similar bowls or trays around the home',
+        what:'Small round pills mistaken by a child for sweets, or medication trays left in generic bowls or trays around the house',
+        where:'Bedside tables, kitchen counters, and any tray or bowl used for small personal items',
+        why:'Round pills and tablets closely resemble sweets to a young child, and this genuinely grandparent-specific risk is easy to overlook because the items feel routine and unremarkable to the adult who uses them daily.',
+        how:'Keep medications entirely separate from other small items like reading glasses, keys, or coins, in a dedicated, secured location rather than a shared bowl or tray, and never refer to medication as "sweets" or "candy" even in play.',
+        measurement:'Medications stored in a dedicated, locked or high location, entirely separate from general small-item trays or bowls.',
+        example:'A pill and a boiled sweet, kept in the same small dish by the armchair out of habit, are indistinguishable to a two-year-old who picks one up.',
+        tip:'Never let medication share a container with anything else, however small or routine it feels — a dedicated spot, every time.' },
+
+      { id:'gp48', num:'GP48', risk:'high', title:'Vitamin and Supplement Storage',
+        who:'Grandparents who take daily vitamins or supplements, often in gummy or chewable form',
+        what:'Vitamins and supplements, especially gummy or flavoured versions, mistaken for sweets by a young child',
+        where:'Kitchen counters, bedside tables, and bathroom cabinets',
+        why:'Chewable and gummy vitamins are specifically designed to taste and look appealing, which makes them just as attractive to a young child as to the intended adult user, and excess of some vitamins can cause real harm.',
+        how:'Store all vitamins and supplements exactly as you would prescription medication — locked or above 1.5m (5ft) — regardless of how "harmless" they seem, and never leave a bottle open on a counter between doses.',
+        measurement:'Vitamins and supplements stored above 1.5m (5ft) or locked, treated with the same caution as prescription medication.',
+        example:'A bottle of gummy multivitamins left open on the kitchen counter after breakfast is found and partly eaten by a visiting three-year-old within the hour.',
+        tip:'Treat every vitamin bottle as if it were a medicine bottle — the storage rule is exactly the same.' },
+
+      { id:'gp49', num:'GP49', risk:'medium', title:'Alcohol Storage',
+        who:'Grandparents who keep alcohol accessible in the home',
+        what:'Alcohol stored at low or easily reachable height, in bottles that may look like ordinary drinks to a young child',
+        where:'Kitchen cupboards, drinks cabinets, and any low storage for alcohol',
+        why:'Alcohol can cause serious harm to a young child even in small amounts, and bottles kept for years in the same accessible spot are easy to overlook as a hazard.',
+        how:'Store alcohol above 1.5m (5ft) or in a cabinet with a child safety lock for the duration of any visit with young children, and never leave a partly finished drink within reach at any point.',
+        measurement:'Alcohol stored above 1.5m (5ft) or in a locked cabinet; no unattended drinks left at child-reachable height at any time.',
+        example:'A grandfather\'s evening drink, left on a low side table while he answers the door, is picked up and sipped by his curious grandson.',
+        tip:'If a drinks cabinet cannot be relocated for the visit, a simple cupboard lock solves the same problem at very low cost.' },
+
+      { id:'gp50', num:'GP50', risk:'high', title:'Garden and Shed Chemical Storage',
+        who:'Grandparents who keep gardening chemicals, pesticides, or fuel in a shed or garden store',
+        what:'Garden chemicals stored at reachable height or in unlabelled containers',
+        where:'Sheds, garages, and outdoor storage areas',
+        why:'Garden chemicals are often stored more casually than household products, sometimes decanted into old drink bottles for convenience, which is a serious poisoning risk if a young child finds them.',
+        how:'Store all garden chemicals in their original, labelled containers, locked or on a high shelf in the shed or garage, and never decant any chemical into a bottle that resembles a drink container.',
+        measurement:'Garden chemicals stored above 1.5m (5ft) or locked; always in original labelled containers, never in repurposed drink bottles.',
+        example:'A weed killer decanted into an old soft-drink bottle for ease of use in the garden is mistaken for a drink by a visiting toddler exploring the shed.',
+        tip:'Never decant any chemical into a drink bottle, however convenient it seems — the original container\'s label is a genuine safety feature, not just paperwork.' },
+
+      { id:'gp51', num:'GP51', risk:'medium', title:'Safe Disposal of Old Medications',
+        who:'Grandparents with expired or unused medications accumulated over time',
+        what:'Old medications kept "just in case," adding unnecessary accessible medication to the home',
+        where:'Bathroom cabinets, kitchen drawers, and bedside tables',
+        why:'Every extra medication kept in the home, even expired or unused, is an additional item that must be secured — reducing the total amount kept reduces overall risk.',
+        how:'Before a visit, go through medication cabinets and dispose of anything expired or no longer needed through your local pharmacy or appropriate collection point, rather than the household bin.',
+        measurement:'Medication cabinet reviewed at least once before any planned visit; expired items disposed of via pharmacy or appropriate collection, not general waste.',
+        example:'A grandmother\'s cabinet holds several years of old prescriptions no longer in use, each one an additional item that needs securing rather than being cleared out.',
+        tip:'A twice-yearly medication cabinet clear-out, timed around expected visits, keeps the total risk in the home as low as possible.' },
+
+      { id:'gp52', num:'GP52', risk:'medium', title:'Keeping Medications in Original Labeled Containers',
+        who:'Grandparents who transfer medication into pill boxes, pockets, or unlabelled containers for convenience',
+        what:'Medication removed from its original, labelled container and placed somewhere less identifiable',
+        where:'Anywhere medication is carried or stored day to day',
+        why:'An unlabelled tablet is harder to identify quickly in an emergency, which matters if a child does access it and a health professional needs to know exactly what was taken.',
+        how:'Keep medications in their original labelled packaging wherever practical, and if a weekly organiser is used, keep the original boxes nearby and accessible for quick identification if needed.',
+        measurement:'Original labelling retained and accessible for every medication kept in the home, even when a weekly organiser is also used.',
+        example:'A grandfather\'s tablets, moved into an unlabelled pocket tin for convenience, cannot be quickly identified when his granddaughter is found with one in her mouth.',
+        tip:'Keep the original box in the same cupboard as any pill organiser, so identification is fast if it\'s ever needed.' },
+
+      { id:'gp53', num:'GP53', risk:'high', title:'Weekly Pill Organiser Safety',
+        who:'Grandparents using a weekly or daily pill organiser box',
+        what:'Pill organisers, often brightly coloured and easy to open, left within a child\'s reach',
+        where:'Kitchen counters, bedside tables, and bathroom shelves',
+        why:'Pill organisers are specifically designed for easy access by the user, which unfortunately also makes them easy and appealing for a young child to open.',
+        how:'Store the pill organiser in the same secured, high, or locked location as other medications, never on an open counter or bedside table during a visit with young children.',
+        measurement:'Pill organiser stored above 1.5m (5ft) or locked, exactly as any other medication container.',
+        example:'A brightly coloured weekly pill organiser left on the kitchen counter for easy morning access is opened, compartment by compartment, by a visiting toddler while breakfast is being made.',
+        tip:'Treat the pill organiser as the single most attractive medication container in the home to a young child, and store it accordingly.' },
+
+      { id:'gp54', num:'GP54', risk:'medium', title:'The "Does Everything Need Re-Locating" Walkthrough',
+        who:'Grandparents preparing for a visit with a specific focus on medication and chemical hazards',
+        what:'A dedicated, final walkthrough asking specifically "does this need to move before they arrive?"',
+        where:'Every room, considered specifically for medication and chemical hazards',
+        why:'This zone covers many individual hazards, and a single, focused final walkthrough catches anything the itemised checks may have missed.',
+        how:'Walk the home a final time asking only one question in each room: "is there anything here a curious young child could swallow, taste, or open?" — relocate or secure anything the answer touches.',
+        measurement:'One dedicated medication/chemical-focused walkthrough per visit, separate from the general home audit in Zone 1.',
+        example:'A grandmother\'s general home audit misses a bottle of ear drops on the bathroom shelf, caught only by this more focused, medication-specific final pass.',
+        tip:'Do this walkthrough last, after every other individual check in this zone, as a genuine final catch-all.' },
+
+      { id:'gp55', num:'GP55', risk:'medium', title:'Secure Storage Furniture and Cabinet Locks',
+        who:'Grandparents without existing child safety locks on cabinets or drawers',
+        what:'Cabinets and drawers holding medication or chemicals without any physical lock or catch',
+        where:'Kitchen, bathroom, and utility cupboards throughout the home',
+        why:'A physical lock or catch removes reliance on remembering to relocate items every single visit, and is a one-time investment that protects every future visit as well as this one.',
+        how:'Fit simple, inexpensive child safety catches to any cupboard or drawer that will hold medication or chemicals, even if the contents are also relocated for extra safety.',
+        measurement:'Safety catches fitted to all cupboards/drawers used for medication or chemical storage, as a permanent rather than visit-only measure.',
+        example:'A grandfather who relocates his medication before every visit finally fits a simple cupboard lock after realising he nearly forgot before a spontaneous, last-minute visit.',
+        tip:'A permanent lock removes the risk of a rushed or forgotten walkthrough before a spontaneous visit — well worth the small one-time cost.' },
+
+      { id:'gp56', num:'GP56', risk:'high', title:'Communicating About the Grandchild\'s Own Medication Needs',
+        who:'Grandparents and parents, regarding any medication the child themselves takes',
+        what:'Uncertainty about what medication the grandchild takes, at what dose, and whether the grandparent is expected to administer it',
+        where:'This conversation happens before the visit, in writing if any medication administration is expected',
+        why:'If a grandchild has their own regular or as-needed medication, the grandparent needs clear, written instructions — dose, timing, and storage — well before being asked to administer anything.',
+        how:'Ask parents to write down any medication the child takes, including dose, timing, and storage instructions, and store that medication securely, separate from the grandparent\'s own, clearly labelled with the child\'s name.',
+        measurement:'Written medication instructions obtained from parents for any medication the child takes, confirmed before the visit begins.',
+        example:'A grandmother is asked to give her grandson "his usual medicine" at lunchtime without a clear written dose, and has to call the parents to confirm before proceeding.',
+        tip:'Ask for medication instructions in writing, not just spoken, so nothing is misremembered under the pressure of a busy visit.' }
+    ]
+  },
+  {
+    id: 5, name: 'Supervision, Water & Outdoor Safety', icon: '🌳',
+    desc: '14 checks covering pool and pond hazards, car seat safety, supervision with multiple grandchildren, bath time, and outdoor play.',
+    checks: [
+      { id:'gp57', num:'GP57', risk:'critical', title:'Pool, Pond or Open Water Hazards',
+        who:'Grandparents with a swimming pool, garden pond, water feature, or nearby open water',
+        what:'Unsecured or unfenced water, a leading cause of serious injury and drowning in young children',
+        where:'Gardens, pool areas, and any property near open water',
+        why:'Young children can drown in a very small amount of water, silently and quickly, and a pond or pool that has been a peaceful feature for years becomes an entirely different hazard the moment a young child visits.',
+        how:'Fence any pool or pond with a self-closing, self-latching gate at least 1.2m (4ft) high, empty any temporary paddling pool immediately after use, and never leave a child unsupervised near any water feature, however shallow it appears.',
+        measurement:'Pool/pond fencing at least 1.2m (4ft) with a self-latching gate; paddling pools emptied immediately after each use; constant, arm\'s-reach supervision near any open water.',
+        example:'A garden pond that has been a peaceful feature for thirty years becomes the single greatest hazard on the property the moment a crawling grandchild visits for the first time.',
+        tip:'If fencing a pond or pool is not practical before a visit, cover it securely or restrict the child\'s access to that part of the garden entirely for the visit\'s duration.' },
+
+      { id:'gp58', num:'GP58', risk:'high', title:'Garden and Yard Hazard Walkthrough',
+        who:'Grandparents with an outdoor space the child will use during the visit',
+        what:'General garden hazards — tools, uneven ground, toxic plants, garden chemicals — accumulated over years of adult-only use',
+        where:'The garden, yard, or outdoor space',
+        why:'A garden safe for adult use for years may contain plants, tools, or uneven surfaces that only become relevant hazards with a young, exploring child present.',
+        how:'Walk the garden before the visit checking for toxic plants (ask a local garden centre or reference source if unsure of a specific plant), tools left out, and uneven or unstable ground, addressing each before the child is allowed to explore freely.',
+        measurement:'One dedicated garden walkthrough per visit, checking plants, tools, and ground surface specifically.',
+        example:'A grandmother\'s ornamental garden includes a toxic plant she has never worried about before, now a real concern with a grandchild who puts everything in her mouth.',
+        tip:'If in doubt about whether a specific plant is toxic, treat it as off-limits and fence or remove it for the visit rather than guessing.' },
+
+      { id:'gp59', num:'GP59', risk:'critical', title:'Safe and Correctly Installed Car Seat Use',
+        who:'Grandparents transporting a grandchild in their own vehicle',
+        what:'An incorrectly fitted, wrong-size, or missing car seat for the child\'s age and size',
+        where:'Any vehicle used to transport the child',
+        why:'A correctly fitted, age- and size-appropriate car seat is one of the single most protective pieces of equipment available, and an incorrect fit or wrong size significantly reduces that protection.',
+        how:'Use a car seat appropriate to the child\'s current age, weight, and height, fitted exactly per its instructions and per the relevant regulation (UN R129 i-Size or the equivalent applicable standard), rear-facing for as long as the seat allows, and check the fit before every single journey.',
+        measurement:'UN R129 (i-Size) or applicable equivalent standard; rear-facing recommended as long as the seat allows; harness fit checked before every journey — snug at the shoulder, no twisted straps.',
+        example:'A grandfather uses a car seat that has sat in his garage since his own children were small, now several sizes too small for his growing grandson.',
+        tip:'If you regularly transport grandchildren, keep an up-to-date, correctly sized car seat installed in your own vehicle rather than relying on borrowed or outdated equipment.' },
+
+      { id:'gp60', num:'GP60', risk:'high', title:'Road and Driveway Safety — Backing Out With Children Present',
+        who:'Grandparents reversing a vehicle on a driveway or in a car park with grandchildren nearby',
+        what:'A child in a reversing vehicle\'s blind spot, a well-documented cause of serious driveway injury',
+        where:'Driveways, car parks, and any area where a vehicle reverses near the home',
+        why:'Small children are exactly the height most likely to fall into a vehicle\'s rear blind spot, and reversing incidents are a genuine, recurring cause of serious injury around family homes.',
+        how:'Always do a walk-around check behind the vehicle before reversing, know exactly where every child is before starting the engine, and have another adult supervise children away from the vehicle during any reversing manoeuvre.',
+        measurement:'Visual walk-around check performed before every reversing manoeuvre with children present on the property.',
+        example:'A grandmother reversing off her driveway to collect groceries does not realise her grandson has followed her out to wave goodbye and is standing directly behind the car.',
+        tip:'Make "where is every child, right now" the very last question before you start the engine, every single time.' },
+
+      { id:'gp61', num:'GP61', risk:'high', title:'Supervision Ratios and Realistic Expectations',
+        who:'Grandparents caring for more than one grandchild at the same time',
+        what:'Underestimating how much harder supervision becomes with multiple children, particularly at different ages and mobility levels',
+        where:'Throughout the home and garden whenever more than one child is present',
+        why:'Supervising two or more children of different ages and abilities is genuinely harder than the sum of supervising each individually, and this is a common, well-recognised area where things go wrong during multi-grandchild visits.',
+        how:'Plan realistically for the number and ages of children visiting — arrange extra help if multiple grandchildren of different mobility levels are visiting at once, and accept that some activities may need to be simpler or shorter with more children present.',
+        measurement:'No fixed ratio, but a deliberate plan made in advance whenever more than one child, especially at different mobility stages, is visiting together.',
+        example:'A grandmother confident caring for one grandchild at a time finds herself genuinely stretched when a crawling infant and a fast-moving three-year-old visit together for the first time.',
+        tip:'If multiple grandchildren are visiting, ask for a second adult\'s help for at least part of the visit rather than assuming the same approach that works for one child will scale up easily.' },
+
+      { id:'gp62', num:'GP62', risk:'critical', title:'Water Safety During Bath Time',
+        who:'Grandparents bathing a young child during the visit',
+        what:'A child left unsupervised in a bath, even briefly, or bath water at an unsafe temperature',
+        where:'The bathroom during bath time',
+        why:'A young child can drown in a small amount of bath water in under a minute, silently, and bath time is a moment where a "quick" distraction feels low-risk but genuinely is not.',
+        how:'Never leave a young child unattended in the bath, even to answer the door or phone — take the child with you if you must leave — and check water temperature with your elbow or a bath thermometer before placing the child in.',
+        measurement:'Constant, arm\'s-reach supervision for the entire bath, no exceptions; bath water temperature commonly recommended around 37–38°C (98.6–100.4°F).',
+        example:'A grandfather steps out to answer the front door "for just a moment" during his granddaughter\'s bath, leaving her alone in the water.',
+        tip:'If you must leave the bathroom for any reason during bath time, take the child out of the bath with you — there is no safe substitute for constant supervision.' },
+
+      { id:'gp63', num:'GP63', risk:'medium', title:'General Outdoor Play Supervision Habits',
+        who:'Grandparents supervising a child playing outdoors during the visit',
+        what:'Reduced supervision attention during outdoor play compared with indoor activities',
+        where:'Gardens, yards, and any outdoor play area',
+        why:'Outdoor spaces are larger, often less enclosed, and can create a false sense that "they\'re just playing outside" needs less active attention than indoor activities.',
+        how:'Maintain active, visual supervision during outdoor play just as you would indoors, position yourself where you can see the whole play area, and check the space for hazards before play begins each time.',
+        measurement:'Active visual supervision maintained throughout all outdoor play, at a level equivalent to indoor supervision.',
+        example:'A grandmother relaxing on a garden bench while her grandson plays nearby loses sight of him for several minutes when she becomes absorbed in a phone call.',
+        tip:'Treat outdoor supervision with the same attention as indoor supervision — the openness of a garden can create hazards just as easily as it creates fun.' },
+
+      { id:'gp64', num:'GP64', risk:'medium', title:'Trampoline and Play Equipment Safety',
+        who:'Grandparents with a trampoline, swing set, or other play equipment on the property',
+        what:'Play equipment used without supervision, safety netting, or age-appropriate rules',
+        where:'Gardens and outdoor play areas with fixed equipment',
+        why:'Trampolines and swing sets are common sources of injury, particularly when used by children outside the age range they were designed for, or without direct supervision.',
+        how:'Supervise all use of trampolines and play equipment directly, limit trampoline use to one child at a time regardless of age, and check equipment for wear, loose fittings, or damaged netting before each use.',
+        measurement:'One child at a time on a trampoline; direct adult supervision for all fixed play-equipment use; equipment checked for wear before each use.',
+        example:'A trampoline installed years ago for older grandchildren is used unsupervised by a much younger visiting grandchild, at a size and age it was never designed for.',
+        tip:'If play equipment was purchased for older children, reassess whether it is appropriate at all for a much younger visiting grandchild, rather than assuming it is universally safe.' },
+
+      { id:'gp65', num:'GP65', risk:'medium', title:'Pet Interactions and Supervision',
+        who:'Grandparents with a pet unaccustomed to young children',
+        what:'A pet reacting unpredictably to a young child\'s unfamiliar movements, noise, or handling',
+        where:'Anywhere the pet and child are together in the home or garden',
+        why:'Even a normally gentle, well-behaved pet can react unpredictably to a young child\'s sudden movements, loud noise, or unintentionally rough handling, especially if the pet has little regular experience with young children.',
+        how:'Never leave a young child and a pet together unsupervised, however trusted the pet, and teach the child gentle interaction rules while actively supervising every interaction.',
+        measurement:'Direct adult supervision for all interactions between young children and pets, with no exceptions based on how well-behaved the pet normally is.',
+        example:'A normally placid family dog, startled by a grandchild\'s sudden grab at its ear, reacts with a warning snap that would not have happened with a more familiar, gentler approach.',
+        tip:'Even the gentlest pet deserves supervised introductions with an unfamiliar young child — it protects both the child and the pet.' },
+
+      { id:'gp66', num:'GP66', risk:'medium', title:'Sun Safety and Heat Awareness Outdoors',
+        who:'Grandparents supervising outdoor play in warm or sunny weather',
+        what:'Sunburn, overheating, or dehydration during outdoor play, particularly in a young child with more sensitive skin',
+        where:'Any outdoor space during warm weather',
+        why:'A young child\'s skin burns more easily than an adult\'s, and children are less able to recognise or communicate early signs of overheating or dehydration themselves.',
+        how:'Apply age-appropriate sunscreen, dress the child in light, breathable clothing and a hat during sunny outdoor play, offer water regularly, and move to shade during the hottest part of the day.',
+        measurement:'Sunscreen reapplied per product instructions, generally every two hours or after water play; regular water offered during any warm-weather outdoor activity.',
+        example:'A grandfather, enjoying a warm afternoon in the garden with his granddaughter, does not notice she has gone several hours without water until she becomes visibly tired and flushed.',
+        tip:'Set a phone reminder for sunscreen reapplication and water breaks during long outdoor sessions in warm weather — it is easy to lose track of time when enjoying a visit.' },
+
+      { id:'gp67', num:'GP67', risk:'high', title:'Fencing and Gate Checks Around Water Features',
+        who:'Grandparents with any water feature, however small, in the garden',
+        what:'A fence or gate around a water feature that is damaged, propped open, or not self-latching',
+        where:'Any pool, pond, or water feature fencing and its gate',
+        why:'A fence that exists but does not close and latch reliably provides a false sense of security while offering little actual protection.',
+        how:'Check every gate around a water feature closes and latches on its own from any position, and repair or replace any damaged or malfunctioning latch before the visit.',
+        measurement:'Self-closing, self-latching gate mechanism tested and confirmed working before every visit involving young children.',
+        example:'A pool gate with a latch that has been "a bit sticky" for months finally fails to catch on the one occasion it matters most.',
+        tip:'Physically test the gate yourself, several times, on the morning of the visit — do not assume it still works simply because it did last time.' },
+
+      { id:'gp68', num:'GP68', risk:'medium', title:'"Always Know Where They Are" — Building the Habit',
+        who:'Every grandparent caring for a young, mobile child',
+        what:'A general habit of losing track of a child\'s exact location for even a short period',
+        where:'Throughout the home and any outdoor space during the visit',
+        why:'Young children move quickly and quietly, and even a brief lapse in awareness of their location is when many incidents in this checklist actually occur.',
+        how:'Build a running habit of always knowing roughly where the child is and what they are doing, checking in visually every few minutes even during otherwise calm moments, and treating any "where did they go?" moment as an immediate priority to resolve.',
+        measurement:'No fixed number, but a deliberate, continuous habit rather than periodic spot-checks.',
+        example:'A grandmother absorbed in a phone call realises she cannot immediately say where her grandson is or what he is doing — a moment that, in a home not fully childproofed, carries real risk.',
+        tip:'If you ever catch yourself unsure where the child is, stop what you\'re doing immediately and locate them before continuing — make this an automatic, non-negotiable reflex.' },
+
+      { id:'gp69', num:'GP69', risk:'medium', title:'Stranger-Danger and Safeguarding Basics for Outings',
+        who:'Grandparents taking a grandchild out in public — parks, shops, playgrounds',
+        what:'General safeguarding basics for public outings, appropriate to the child\'s age',
+        where:'Parks, shops, playgrounds, and any public outing during the visit',
+        why:'Public outings introduce a different set of considerations than the home environment, and simple, age-appropriate habits reduce risk without needing to frighten the child.',
+        how:'Keep young children within arm\'s reach in public spaces, use a wrist strap or hold hands in crowded or busy areas, and agree a simple plan with older children for what to do if separated (stay where they are, find a specific type of helper).',
+        measurement:'Arm\'s-reach proximity for young children in public; a simple, agreed separation plan for older children on any outing.',
+        example:'A grandfather momentarily distracted at a busy market loses sight of his three-year-old granddaughter for several minutes before finding her at a nearby stall.',
+        tip:'Agree a simple, calm "if we get separated" plan with an older grandchild before any outing — it reduces panic on both sides if it ever happens.' },
+
+      { id:'gp70', num:'GP70', risk:'medium', title:'Weather-Appropriate Outdoor Safety',
+        who:'Grandparents planning outdoor activities in cold, wet, or otherwise challenging weather',
+        what:'A child under- or over-dressed for genuinely challenging weather conditions during outdoor time',
+        where:'Any outdoor activity during the visit, in any season',
+        why:'Young children regulate their own body temperature less efficiently than adults, and weather that feels manageable to a grandparent may be genuinely uncomfortable or risky for a young child.',
+        how:'Dress the child in weather-appropriate layers for the actual conditions — extra insulation and waterproofing in cold or wet weather, breathable protection in heat — and shorten outdoor time in more extreme conditions.',
+        measurement:'Weather-appropriate clothing layers checked before every outdoor outing; outdoor time shortened in temperature extremes for young children.',
+        example:'A grandmother, comfortable herself in a light coat on a cold, windy day, does not realise her grandson is under-dressed for the actual wind chill until he becomes noticeably distressed by the cold.',
+        tip:'Dress the child for the weather the forecast describes, not the weather it feels like standing in a warm car or home before heading out.' }
+    ]
+  },
+  {
+    id: 6, name: 'Communication & Emergency Preparedness', icon: '📞',
+    desc: '14 checks covering pre-visit conversations with parents, emergency contacts, medication permissions, and a confident, prepared close.',
+    checks: [
+      { id:'gp71', num:'GP71', risk:'high', title:'Talking to Parents Before the Visit — The Questions to Ask',
+        who:'Grandparents and parents, in the days before any visit',
+        what:'A structured, practical conversation covering house rules, allergies, and routines, rather than relying on assumption or memory',
+        where:'This conversation happens before the visit, by phone, message, or in person',
+        why:'A short, structured conversation before every visit catches most of the individual issues covered elsewhere in this checklist, and prevents the majority of avoidable surprises.',
+        how:'Before every visit, ask parents directly: any new allergies or medical conditions, current sleep and meal routines, any medication needed, screen-time rules, and anything specific to this particular visit. Write the answers down.',
+        measurement:'One structured pre-visit conversation covering allergies, routines, medication, and house rules, held before every single visit regardless of how recent the last one was.',
+        example:'A five-minute phone call before a weekend visit reveals a new allergy, a changed nap time, and a house rule about screen time that would otherwise have been discovered by trial and error.',
+        tip:'Keep a simple, standing list of these questions on your phone so the same structured conversation happens easily before every visit, not just the first.' },
+
+      { id:'gp72', num:'GP72', risk:'critical', title:'Emergency Contact Information and Medical Treatment Permissions',
+        who:'Grandparents caring for a grandchild, particularly during any overnight or extended stay',
+        what:'Missing emergency contacts or unclear permission to seek medical treatment on the parents\' behalf if needed',
+        where:'Prepared in advance, kept with the grandparent\'s own emergency information',
+        why:'If a child needs medical attention while a grandparent is the sole responsible adult, having clear parental contact details and, where relevant, written permission to authorise treatment saves critical time.',
+        how:'Before any extended or overnight visit, ask parents for their emergency contact details, the child\'s health professional\'s details, and any written note confirming the grandparent can seek emergency treatment if the parents cannot be reached immediately. Save all of this in your cheat sheet.',
+        measurement:'Parents\' emergency contacts, the child\'s health professional\'s details, and any treatment-authorisation note saved in the cheat sheet before every extended or overnight visit.',
+        example:'A grandmother caring for her grandson overnight does not have a quick way to reach his parents when he develops a sudden high fever, losing valuable minutes trying to track down a number.',
+        tip:'Update this information before every extended visit, not just the first one — contact details and health professionals can change.' },
+
+      { id:'gp73', num:'GP73', risk:'critical', title:'If a Grandchild Is Injured in Your Care — What to Do',
+        who:'Every grandparent caring for a grandchild',
+        what:'Uncertainty about the right steps to take if an injury occurs while the child is in the grandparent\'s care',
+        where:'Anywhere during the visit',
+        why:'Having a clear, calm framework in mind before an injury happens means less panic and faster, more appropriate action if one does occur.',
+        how:'For any injury, assess whether it needs immediate emergency care (call your local emergency number immediately for anything serious), same-day medical review (call your health professional or urgent care line), or can be managed with basic first aid and observation at home — and contact the parents as soon as the immediate response is underway, not before.',
+        measurement:'A three-tier response framework held in mind in advance: immediate emergency care, same-day medical review, or basic first aid and observation — with parents contacted promptly once the immediate response is in hand.',
+        example:'A grandfather, having thought through his response plan in advance, calmly manages a grazed knee with basic first aid, while knowing exactly what a more serious injury would require of him instead.',
+        tip:'Take a basic first-aid refresher course if it has been some years since your last one — confidence in an emergency comes from preparation, not luck.' },
+
+      { id:'gp74', num:'GP74', risk:'medium', title:'Screen-Time and Technology House Rules',
+        who:'Grandparents and parents with potentially different views on screen time',
+        what:'A grandparent unintentionally undermining the parents\' screen-time rules during the visit',
+        where:'Throughout the visit, wherever devices or screens are used',
+        why:'Screen-time rules are a common area of difference between generations, and respecting the parents\' current approach — even if it differs from the grandparent\'s own instinct — supports consistency for the child and trust between households.',
+        how:'Ask parents directly what their current screen-time rules are before the visit, and follow them as closely as practical, treating any exceptions as the parents\' decision to make, not the grandparent\'s.',
+        measurement:'One screen-time rules conversation confirmed with parents before every visit.',
+        example:'A grandmother who enjoys letting her grandson watch extra television during visits is unaware this conflicts with a specific limit his parents have recently introduced for developmental reasons.',
+        tip:'If you disagree with a screen-time rule, raise it directly with the parents rather than quietly working around it during the visit — consistency matters to the child more than the specific rule itself.' },
+
+      { id:'gp75', num:'GP75', risk:'high', title:'Allergies and Medical Conditions — Get It in Writing',
+        who:'Grandparents and parents, regarding any allergy or medical condition',
+        what:'Relying on memory or a verbal conversation from a previous visit rather than a current written record',
+        where:'Kept with the visit\'s cheat sheet notes, referred to throughout the visit',
+        why:'Verbal information from months or years ago can be misremembered or become outdated, and a written record removes ambiguity at exactly the moment it matters most.',
+        how:'Ask parents to provide a simple written note — even a short message — of any current allergies or medical conditions before every visit, and keep it with your cheat sheet notes for quick reference.',
+        measurement:'One written allergy/medical-condition record obtained and kept accessible for every visit, updated even if a previous record already exists.',
+        example:'A grandfather, working from a two-year-old memory of "no allergies," is unaware his granddaughter was diagnosed with a new allergy only months earlier.',
+        tip:'Ask for this in writing every single visit, not just the first — conditions and allergies can change at any point in a child\'s early years.' },
+
+      { id:'gp76', num:'GP76', risk:'medium', title:'The Grandparent\'s Cheat Sheet Mindset',
+        who:'Every grandparent using this checklist',
+        what:'Treating the personalised cheat sheet as a genuine working tool rather than a one-off exercise',
+        where:'Kept accessible throughout every visit, updated as things change',
+        why:'A cheat sheet filled in once and forgotten is far less useful than one treated as a living document, updated before every visit as circumstances change.',
+        how:'Fill in your cheat sheet with current emergency contacts, allergy information, and key numbers, and make reviewing and updating it part of your standard pre-visit routine, not a task done only once.',
+        measurement:'Cheat sheet reviewed and updated before every visit, not treated as a single, permanent document.',
+        example:'A grandmother who filled in her cheat sheet a year ago has an outdated phone number for her daughter-in-law, discovered only when she actually needs to make the call.',
+        tip:'Make reviewing your cheat sheet the very first thing you do when a visit is confirmed — it takes moments and keeps everything current.' },
+
+      { id:'gp77', num:'GP77', risk:'medium', title:'Keeping Parents\' Contact Info Easily Accessible',
+        who:'Grandparents caring for a grandchild while the parents are away',
+        what:'Parents\' contact details buried in a phone rather than immediately accessible',
+        where:'Wherever the grandparent will actually be during the visit',
+        why:'In a stressful moment, searching through a phone for a contact takes valuable time that a simply, visibly saved note does not.',
+        how:'Keep the parents\' contact details written down in your cheat sheet as well as saved in your phone, so there are two reliable ways to find them quickly if needed.',
+        measurement:'Parents\' contact details available in at least two accessible forms (written cheat sheet plus phone) during every visit.',
+        example:'A grandfather\'s phone battery dies during a busy afternoon, and his only saved contact for the parents was in that phone, with no written backup available.',
+        tip:'A written backup costs nothing and solves a problem a dead battery or lost phone would otherwise create at the worst possible moment.' },
+
+      { id:'gp78', num:'GP78', risk:'medium', title:'Behavioural and Developmental Considerations',
+        who:'Grandparents and parents, regarding any behavioural or developmental approach the parents want respected',
+        what:'A grandparent unintentionally using an approach to behaviour or development that conflicts with the parents\' current strategy',
+        where:'Throughout the visit, in day-to-day interactions with the child',
+        why:'Parents may be using a specific, considered approach to a developmental stage, a sensory need, or a behavioural strategy, and consistency between homes supports the child, even where the grandparent\'s instinct differs.',
+        how:'Ask parents directly whether there is any specific approach they would like followed for behaviour, discipline, or developmental support, and respect it during the visit, raising any disagreement with the parents rather than the child.',
+        measurement:'One conversation about behavioural/developmental preferences held before any visit where this is relevant.',
+        example:'A grandmother\'s instinct to offer a sweet treat to calm a tantrum conflicts with a specific, considered strategy her daughter is currently using and has asked her to follow instead.',
+        tip:'If a parent\'s approach seems unfamiliar, ask them to explain their reasoning rather than substituting your own instinct in the moment — it protects consistency for the child.' },
+
+      { id:'gp79', num:'GP79', risk:'high', title:'Medication Administration Permission and Process',
+        who:'Grandparents who may be asked to give the grandchild\'s own medication during the visit',
+        what:'Giving medication without clear, confirmed permission, dose, and timing from the parents',
+        where:'Wherever the child\'s medication is given during the visit',
+        why:'Administering medication to a child who is not your own requires clear authorisation and precise instructions — assumptions or guesswork here carry real risk.',
+        how:'Only give medication with the parents\' clear, ideally written, instruction covering the exact dose, timing, and method, and confirm you have understood correctly before the first dose of the visit.',
+        measurement:'Written or explicitly confirmed medication instructions obtained before administering any medication to a grandchild, every time.',
+        example:'A grandmother, unsure of the exact dose for a grandchild\'s regular medication, calls the parents to confirm rather than estimating from memory.',
+        tip:'If any part of the instruction is unclear, always call to confirm rather than guessing — this is never an area for assumption.' },
+
+      { id:'gp80', num:'GP80', risk:'low', title:'Confidence-Building Closing Check — Trust Your Preparation',
+        who:'Every grandparent who has worked through this checklist',
+        what:'Lingering anxiety about the visit despite having done the preparation',
+        where:'A final, reflective moment before or during the visit',
+        why:'Thorough preparation, not worry, is what actually keeps a grandchild safe, and recognising the preparation you have done is a genuine, evidence-based reason for confidence rather than continued anxiety.',
+        how:'Review what you have covered across this checklist, acknowledge the real preparation behind you, and allow yourself to relax into enjoying the visit rather than remaining anxious throughout it.',
+        measurement:'No fixed measurement — a deliberate, reflective step rather than a numeric check.',
+        example:'A grandmother who worked through every zone of this checklist finds she can genuinely relax and enjoy her granddaughter\'s visit, trusting the preparation she has already done.',
+        tip:'Preparation is what protects a child — not ongoing worry. Trust the work you have put in and enjoy the visit.' },
+
+      { id:'gp81', num:'GP81', risk:'low', title:'"It\'s Okay to Ask" — Destigmatising Questions to Parents',
+        who:'Grandparents who feel hesitant to ask parents "basic" questions about their own grandchild',
+        what:'Avoiding a question to parents out of a feeling that it should already be known, or a wish not to seem overly cautious',
+        where:'Any point before or during the visit where a question arises',
+        why:'Parenting guidance and individual children\'s needs both change quickly, and asking a question is a sign of good, current care, not a lack of experience or competence.',
+        how:'Treat every question to the parents as a normal, welcome part of preparing for a safe visit, and ask directly rather than guessing or relying on how things were done in the past.',
+        measurement:'No fixed measurement — a standing permission to ask, applied throughout every visit.',
+        example:'A grandfather who initially hesitates to ask "is it still okay to give juice?" finds the parents genuinely appreciate being asked rather than assumed about.',
+        tip:'Asking a question is not a sign you don\'t know what you\'re doing — it is exactly what good, current care looks like.' },
+
+      { id:'gp82', num:'GP82', risk:'medium', title:'Planning Daily Routines to Reduce Meltdowns and Risk',
+        who:'Grandparents planning the shape of a visit\'s day',
+        what:'An unstructured day that leads to an overtired, overstimulated child, increasing both meltdowns and safety risk',
+        where:'Throughout the day during any visit',
+        why:'An overtired or overstimulated young child is measurably more likely to have a meltdown and, separately, is genuinely less safe — tiredness affects coordination, awareness, and impulse control.',
+        how:'Plan the visit\'s day loosely around the child\'s usual nap and meal times rather than around adult convenience alone, and build in quieter periods between exciting activities to avoid overstimulation.',
+        measurement:'Daily plan built around the child\'s usual nap and meal timing, with quieter periods planned between more stimulating activities.',
+        example:'A grandmother who plans a full day of exciting outings without any nap break finds her granddaughter increasingly unsteady and prone to falls by mid-afternoon, purely from tiredness.',
+        tip:'When in doubt, protect the nap — a well-rested child is measurably safer as well as happier for the rest of the visit.' },
+
+      { id:'gp83', num:'GP83', risk:'medium', title:'End-of-Visit Handover — Communicating Back to Parents',
+        who:'Grandparents at the end of a visit, particularly an overnight or extended stay',
+        what:'Parents left without a clear picture of how the visit went — sleep, meals, any bumps or incidents, mood',
+        where:'At pickup or drop-off, or via message shortly after the visit',
+        why:'A brief, honest handover helps parents settle their child back into their usual routine and ensures nothing — even a minor bump or a missed nap — goes unmentioned.',
+        how:'Give parents a short summary at handover: how sleep and meals went, any incidents however minor, and anything different from the usual routine, treated as a normal, welcome part of every visit rather than an admission of fault.',
+        measurement:'One handover summary given at the end of every visit, covering sleep, meals, and any incidents.',
+        example:'A grandmother mentions in passing that her grandson bumped his head lightly on a table leg, information the parents are glad to have even though it was very minor.',
+        tip:'Mention even minor incidents at handover — parents consistently prefer to know, and it builds trust for future visits.' },
+
+      { id:'gp84', num:'GP84', risk:'low', title:'General Readiness Reflection',
+        who:'Every grandparent completing this full checklist',
+        what:'A final, whole-checklist reflection on readiness for the visit ahead',
+        where:'Before the visit begins, as a closing step',
+        why:'Working through all 84 checks across six zones represents genuine, thorough preparation, and taking a moment to recognise that is worth doing before the visit begins.',
+        how:'Review your cheat sheet, confirm the key conversations with parents have happened, and take a moment to feel ready rather than anxious — you have done real, evidence-based preparation for this visit.',
+        measurement:'No fixed measurement — a closing reflection marking the completion of the full 84-check audit.',
+        example:'A grandfather who has worked through every zone of this checklist feels genuinely, calmly ready for his grandchildren\'s visit, rather than vaguely worried as he might have felt before.',
+        tip:'Completing this checklist is real preparation, not busywork — let that be the confidence you carry into every visit.' }
+    ]
+  }
+];
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const STORE_KEY = 'safelife-grandparentproofing-pro';
+const completed = new Set();
+let lang = 'en', theme = 'terracotta', mode = 'light', riskFilter = null, activeZone = 1;
+const TOTAL = 84;
+
+function t(key){ return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key; }
+function persist(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify({completed:[...completed], lang, theme, mode})); }catch(e){}
+}
+function restore(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(!raw) return;
+    const d = JSON.parse(raw);
+    (d.completed||[]).forEach(id=>completed.add(id));
+    if(false && d.lang && I18N[d.lang]) lang = d.lang; /* language switching disabled for English-only release — remove "false &&" to re-enable */
+    if(d.theme) theme = d.theme;
+    if(d.mode) mode = d.mode;
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════
+// PROGRESS & STATS
+// ═══════════════════════════════════════════
+function updateProgress(){
+  const done = completed.size;
+  document.getElementById('topbar-done').textContent = done;
+  document.getElementById('progress-count').textContent = done + ' ' + t('ofWord') + ' ' + TOTAL;
+  document.getElementById('progress-fill').style.width = (done/TOTAL*100) + '%';
+  ZONES.forEach(z=>{
+    const zDone = z.checks.filter(c=>completed.has(c.id)).length;
+    document.getElementById('ztc-'+z.id).textContent = zDone + '/14';
+  });
+  document.getElementById('celebrate').classList.toggle('show', done === TOTAL);
+  persist();
+}
+function fillStats(){
+  const counts = {critical:0,high:0,medium:0,low:0};
+  ZONES.forEach(z=>z.checks.forEach(c=>counts[c.risk]++));
+  ['critical','high','medium','low'].forEach(r=>{ document.getElementById('s-'+r).textContent = counts[r]; });
+}
+
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function buildCard(check){
+  const card = document.createElement('div');
+  card.className = 'check-card' + (completed.has(check.id) ? ' completed' : '');
+  card.dataset.id = check.id;
+  card.dataset.risk = check.risk;
+  card.innerHTML =
+    '<div class="check-header">' +
+      '<div class="check-checkbox">' + (completed.has(check.id) ? '✓' : '') + '</div>' +
+      '<div class="check-num">' + check.num + '</div>' +
+      '<div class="check-risk risk-' + check.risk + '">' + t(check.risk) + '</div>' +
+      '<div class="check-title">' + check.title + '</div>' +
+      '<div class="check-chevron">▼</div>' +
+    '</div>' +
+    '<div class="check-detail">' +
+      '<div class="detail-grid">' +
+        '<div class="detail-item"><div class="detail-label"><span>👤</span>' + t('who') + '</div><div class="detail-value">' + check.who + '</div></div>' +
+        '<div class="detail-item"><div class="detail-label"><span>⚠️</span>' + t('what') + '</div><div class="detail-value">' + check.what + '</div></div>' +
+        '<div class="detail-item"><div class="detail-label"><span>📍</span>' + t('where') + '</div><div class="detail-value">' + check.where + '</div></div>' +
+        '<div class="detail-item"><div class="detail-label"><span>❓</span>' + t('why') + '</div><div class="detail-value">' + check.why + '</div></div>' +
+        '<div class="detail-item full"><div class="detail-label"><span>🔧</span>' + t('how') + '</div><div class="detail-value">' + check.how + '</div></div>' +
+      '</div>' +
+      '<div class="measurement-box"><strong>📏 ' + t('standards') + '</strong>' + check.measurement + '</div>' +
+      '<div class="detail-item full" style="margin-top:10px;"><div class="detail-label"><span>💬</span>' + t('example') + '</div><div class="detail-value">' + check.example + '</div></div>' +
+      '<div class="tip-box"><span class="tip-icon">💡</span><span class="tip-text"><strong>' + t('quickTip') + ':</strong> ' + check.tip + '</span></div>' +
+    '</div>';
+  card.querySelector('.check-header').addEventListener('click', function(){ card.classList.toggle('open'); });
+  card.querySelector('.check-checkbox').addEventListener('click', function(e){
+    e.stopPropagation();
+    if(completed.has(check.id)){ completed.delete(check.id); card.classList.remove('completed'); this.textContent=''; }
+    else { completed.add(check.id); card.classList.add('completed'); this.textContent='✓'; }
+    updateProgress();
+  });
+  return card;
+}
+
+function renderAll(){
+  document.querySelectorAll('.zone-panel').forEach(p=>p.remove());
+  const main = document.getElementById('main-content');
+  ZONES.forEach(z=>{
+    const panel = document.createElement('div');
+    panel.className = 'zone-panel' + (z.id === activeZone ? ' active' : '');
+    panel.id = 'zone-panel-' + z.id;
+    const header = document.createElement('div');
+    header.className = 'zone-header';
+    header.innerHTML = '<div class="zone-icon">' + (ICONS['z'+z.id] || z.icon) + '</div><div class="zone-header-text"><h2>' + t('z'+z.id) + '</h2><p>' + t('zd'+z.id) + '</p></div>';
+    panel.appendChild(header);
+    const actions = document.createElement('div');
+    actions.className = 'zone-actions';
+    const bExpand = document.createElement('button'); bExpand.className='btn btn-outline'; bExpand.textContent=t('expandAll');
+    const bCollapse = document.createElement('button'); bCollapse.className='btn btn-outline'; bCollapse.textContent=t('collapseAll');
+    const bUnmark = document.createElement('button'); bUnmark.className='btn btn-outline'; bUnmark.textContent=t('unmarkAll');
+    const bMark = document.createElement('button'); bMark.className='btn btn-primary'; bMark.textContent=t('markAll');
+    actions.append(bExpand,bCollapse,bUnmark,bMark);
+    panel.appendChild(actions);
+    const list = document.createElement('div');
+    list.className = 'checks-list';
+    z.checks.forEach(c=>list.appendChild(buildCard(c)));
+    panel.appendChild(list);
+    const disc = document.createElement('div');
+    disc.className = 'zone-disclaimer';
+    disc.textContent = '⚕ ' + t('disclaimer');
+    panel.appendChild(disc);
+    bExpand.addEventListener('click', ()=>list.querySelectorAll('.check-card').forEach(c=>c.classList.add('open')));
+    bCollapse.addEventListener('click', ()=>list.querySelectorAll('.check-card').forEach(c=>c.classList.remove('open')));
+    bMark.addEventListener('click', ()=>{ z.checks.forEach(c=>completed.add(c.id)); refreshCards(list); });
+    bUnmark.addEventListener('click', ()=>{ z.checks.forEach(c=>completed.delete(c.id)); refreshCards(list); });
+    main.appendChild(panel);
+  });
+  applyFilters();
+  updateProgress();
+}
+function refreshCards(list){
+  list.querySelectorAll('.check-card').forEach(card=>{
+    const done = completed.has(card.dataset.id);
+    card.classList.toggle('completed', done);
+    card.querySelector('.check-checkbox').textContent = done ? '✓' : '';
+  });
+  updateProgress();
+}
+
+// ═══════════════════════════════════════════
+// ZONES / SEARCH / FILTERS
+// ═══════════════════════════════════════════
+function switchZone(id){
+  activeZone = id;
+  document.querySelectorAll('.zone-tab').forEach(tab=>tab.classList.toggle('active', +tab.dataset.zone === id));
+  document.querySelectorAll('.zone-panel').forEach(p=>p.classList.toggle('active', p.id === 'zone-panel-' + id));
+}
+document.querySelectorAll('.zone-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{ document.getElementById('search-input').value=''; applyFilters(); switchZone(+tab.dataset.zone); });
+});
+document.querySelectorAll('.hero-badge[data-zone]').forEach(badge=>{
+  badge.addEventListener('click', ()=>{
+    switchZone(+badge.dataset.zone);
+    document.getElementById('zone-tabs').scrollIntoView({behavior:'smooth'});
+  });
+});
+document.querySelectorAll('.stat-pill[data-risk]').forEach(pill=>{
+  pill.addEventListener('click', ()=>{
+    riskFilter = (riskFilter === pill.dataset.risk) ? null : pill.dataset.risk;
+    document.querySelectorAll('.stat-pill[data-risk]').forEach(p=>p.classList.toggle('filter-on', p.dataset.risk === riskFilter));
+    applyFilters();
+  });
+});
+document.getElementById('search-input').addEventListener('input', applyFilters);
+
+function applyFilters(){
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const searching = q.length > 0;
+  let anyVisible = false;
+  ZONES.forEach(z=>{
+    const panel = document.getElementById('zone-panel-' + z.id);
+    if(!panel) return;
+    let zoneVisible = 0;
+    panel.querySelectorAll('.check-card').forEach(card=>{
+      const check = z.checks.find(c=>c.id === card.dataset.id);
+      const text = (check.title+' '+check.who+' '+check.what+' '+check.where+' '+check.why+' '+check.how+' '+check.measurement+' '+check.example+' '+check.tip).toLowerCase();
+      const matchQ = !searching || text.includes(q);
+      const matchR = !riskFilter || check.risk === riskFilter;
+      const show = matchQ && matchR;
+      card.style.display = show ? '' : 'none';
+      if(show) zoneVisible++;
+    });
+    if(searching || riskFilter){
+      panel.classList.toggle('active', zoneVisible > 0);
+      panel.querySelector('.zone-actions').style.display = 'none';
+    } else {
+      panel.classList.toggle('active', z.id === activeZone);
+      panel.querySelector('.zone-actions').style.display = '';
+    }
+    if(zoneVisible > 0) anyVisible = true;
+  });
+  document.getElementById('search-no-results').style.display = (searching || riskFilter) && !anyVisible ? 'block' : 'none';
+}
+
+// ═══════════════════════════════════════════
+// THEMES / MODE / LANGUAGE
+// ═══════════════════════════════════════════
+const THEMES = [
+  {id:'terracotta',  name:'Terracotta',   c:'#B5642B'},
+  {id:'teal',   name:'Teal Calm',     c:'#14B8A6'},
+  {id:'amber',  name:'Warm Amber',    c:'#F59E0B'},
+  {id:'rose',   name:'Rose Care',     c:'#E11D48'},
+  {id:'violet', name:'Gentle Violet', c:'#7C3AED'},
+  {id:'ocean',  name:'Ocean Blue',    c:'#2563EB'},
+  {id:'forest', name:'Forest Green',  c:'#16A34A'}
+];
+function buildThemeMenu(){
+  const dd = document.getElementById('dd-theme');
+  dd.innerHTML = '<div class="dropdown-title">' + t('theme') + '</div>';
+  THEMES.forEach(th=>{
+    const row = document.createElement('button');
+    row.className = 'theme-row' + (th.id === theme ? ' selected' : '');
+    row.innerHTML = '<span class="theme-swatch" style="background:' + th.c + '"></span>' + th.name + (th.id === theme ? '<span class="check-mark">✓</span>' : '');
+    row.addEventListener('click', e=>{
+      e.stopPropagation();
+      theme = th.id;
+      document.body.dataset.theme = theme;
+      buildThemeMenu(); persist();
+    });
+    dd.appendChild(row);
+  });
+}
+function buildLangMenu(){
+  const dd = document.getElementById('dd-lang');
+  dd.innerHTML = '<div class="dropdown-title">🌐 Language</div>';
+  Object.keys(I18N).forEach(code=>{
+    const row = document.createElement('button');
+    row.className = 'theme-row' + (code === lang ? ' selected' : '');
+    row.innerHTML = '<span style="font-weight:800;font-size:11px;color:var(--accent);min-width:22px;">' + code.toUpperCase() + '</span>' + I18N[code].name + (code === lang ? '<span class="check-mark">✓</span>' : '');
+    row.addEventListener('click', e=>{
+      e.stopPropagation();
+      lang = code;
+      applyLang(); renderAll(); buildLangMenu(); buildManual(); buildCheat(); buildCollection(); persist();
+    });
+    dd.appendChild(row);
+  });
+  const note = document.createElement('div');
+  note.style.cssText = 'font-size:10.5px;color:var(--ink-soft);padding:8px;max-width:230px;line-height:1.4;';
+  note.textContent = t('langNote');
+  dd.appendChild(note);
+}
+function applyLang(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.innerHTML = t(el.dataset.i18n); });
+  document.getElementById('search-input').placeholder = t('searchPh');
+  document.getElementById('lang-label').textContent = lang.toUpperCase();
+  document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+  document.documentElement.lang = lang;
+}
+function toggleDropdown(id, e){
+  e.stopPropagation();
+  const dd = document.getElementById(id);
+  const wasOpen = dd.classList.contains('open');
+  document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('open'));
+  if(!wasOpen) dd.classList.add('open');
+}
+document.getElementById('btn-theme').addEventListener('click', e=>toggleDropdown('dd-theme', e));
+document.getElementById('btn-lang').addEventListener('click', e=>toggleDropdown('dd-lang', e));
+document.addEventListener('click', ()=>document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('open')));
+document.getElementById('btn-mode').addEventListener('click', function(){
+  mode = mode === 'light' ? 'dark' : 'light';
+  document.body.dataset.mode = mode;
+  this.textContent = mode === 'light' ? '🌙' : '☀️';
+  persist();
+});
+
+// ═══════════════════════════════════════════
+// SAVE / LOAD PROGRESS
+// ═══════════════════════════════════════════
+document.getElementById('btn-save').addEventListener('click', ()=>{
+  const data = { product:'SafeLife', module:'grandparent-proofing', version:1, savedAt:new Date().toISOString(), completed:[...completed], lang, theme, mode };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'SafeLife_GrandparentProofing_Progress_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+document.getElementById('btn-load').addEventListener('click', ()=>document.getElementById('load-file').click());
+document.getElementById('load-file').addEventListener('change', function(){
+  const file = this.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const d = JSON.parse(reader.result);
+      if(d.module !== 'grandparent-proofing' && !confirm('This file was saved from a different module. Load anyway?')) return;
+      completed.clear();
+      (d.completed||[]).forEach(id=>completed.add(id));
+      if(false && d.lang && I18N[d.lang]) lang = d.lang; /* language switching disabled for English-only release — remove "false &&" to re-enable */
+      if(d.theme) theme = d.theme;
+      if(d.mode) mode = d.mode;
+      document.body.dataset.theme = theme;
+      document.body.dataset.mode = mode;
+      document.getElementById('btn-mode').textContent = mode === 'light' ? '🌙' : '☀️';
+      applyLang(); renderAll(); buildThemeMenu(); buildLangMenu(); persist();
+    }catch(e){ alert('Could not read that file — is it a SafeLife progress file?'); }
+  };
+  reader.readAsText(file);
+  this.value = '';
+});
+
+// ═══════════════════════════════════════════
+// MODALS / PRINT / NAV
+// ═══════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-close').forEach(b=>b.addEventListener('click', ()=>closeModal(b.dataset.close)));
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click', e=>{ if(e.target === o) o.classList.remove('open'); }));
+document.getElementById('btn-manual').addEventListener('click', ()=>openModal('modal-manual'));
+document.getElementById('btn-cheat').addEventListener('click', ()=>openModal('modal-cheat'));
+document.getElementById('btn-print').addEventListener('click', ()=>openModal('modal-print'));
+document.getElementById('btn-search').addEventListener('click', ()=>{
+  const s = document.getElementById('search-input');
+  s.scrollIntoView({behavior:'smooth', block:'center'});
+  setTimeout(()=>s.focus(), 350);
+});
+
+function doPrint(cls){
+  document.querySelectorAll('.modal-overlay').forEach(o=>o.classList.remove('open'));
+  const wasOpen = new Set([...document.querySelectorAll('.check-card.open')]);
+  document.querySelectorAll('.check-card').forEach(c=>c.classList.add('open'));
+  if(cls) document.body.classList.add(cls);
+  const cleanup = ()=>{
+    document.body.classList.remove('print-zone','print-cheat');
+    document.querySelectorAll('.check-card').forEach(c=>{ if(!wasOpen.has(c)) c.classList.remove('open'); });
+    window.removeEventListener('afterprint', cleanup);
+  };
+  window.addEventListener('afterprint', cleanup);
+  setTimeout(()=>window.print(), 60);
+}
+document.getElementById('print-all').addEventListener('click', ()=>doPrint(null));
+document.getElementById('print-zone').addEventListener('click', ()=>doPrint('print-zone'));
+document.getElementById('print-cheat2').addEventListener('click', ()=>doPrint('print-cheat'));
+document.getElementById('btn-print-cheat').addEventListener('click', ()=>doPrint('print-cheat'));
+
+function visibleCards(){
+  return [...document.querySelectorAll('.zone-panel.active .check-card')].filter(c=>c.style.display !== 'none');
+}
+function nearestCardIx(cards){
+  const mark = window.innerHeight * 0.35;
+  let best = 0, bestDist = Infinity;
+  cards.forEach((c, i)=>{
+    const d = Math.abs(c.getBoundingClientRect().top - mark);
+    if(d < bestDist){ bestDist = d; best = i; }
+  });
+  return best;
+}
+function goToCard(cards, ix){
+  if(ix < 0){ window.scrollTo({top:0, behavior:'smooth'}); return; }
+  if(ix > cards.length - 1) ix = cards.length - 1;
+  const y = cards[ix].getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.35;
+  window.scrollTo({top: Math.max(0, y), behavior:'smooth'});
+}
+document.getElementById('fn-top').addEventListener('click', ()=>window.scrollTo({top:0, behavior:'smooth'}));
+document.getElementById('fn-next').addEventListener('click', ()=>{
+  const cards = visibleCards(); if(!cards.length) return;
+  goToCard(cards, nearestCardIx(cards) + 1);
+});
+document.getElementById('fn-prev').addEventListener('click', ()=>{
+  const cards = visibleCards(); if(!cards.length) return;
+  goToCard(cards, nearestCardIx(cards) - 1);
+});
+
+// ═══════════════════════════════════════════
+// MANUAL / CHEAT SHEET / COLLECTION
+// ═══════════════════════════════════════════
+function buildManual(){
+  document.getElementById('manual-body').innerHTML =
+    t('manualBody') +
+    '<h4>⚕</h4><p>' + t('disclaimer') + ' ' + t('langNote') + '</p>';
+}
+
+const GOLDEN_RULES = [
+  'Your own medications are usually the single biggest hazard in a grandparent\'s home — lock them away or store them above 1.5m (5ft) before every visit',
+  'Never leave a young child unsupervised in a bath, pool, pond, or near any open water, even for a moment — drowning can happen silently in under a minute',
+  'Fit a stair gate certified to a recognised standard (e.g. BS EN 1930) at the top and bottom of every staircase the child can reach',
+  'Follow current safe-sleep guidance for any infant in your care — back to sleep, bare firm surface, no loose bedding — even if it differs from how you raised your own children',
+  'Quarter grapes and similar round foods, and avoid whole nuts and hard sweets, per the parents\' guidance for the child\'s age',
+  'Ask parents before every visit about any new allergies, medical conditions, or medication needs — write the answer down',
+  'Use a correctly fitted, age-appropriate car seat (UN R129 or equivalent) for every journey, checked before you set off',
+  'Keep the child within arm\'s reach around any water, road, or driveway, and always check behind a vehicle before reversing',
+  'Save your local poison-information and emergency contacts in this cheat sheet — never rely on memory in a stressful moment',
+  'When in doubt about anything — a food, a medication, a routine — ask the parents directly; it\'s a sign of good care, not a lack of it'
+];
+const KEY_NUMBERS = [
+  ['Stair gate standard','BS EN 1930 or equivalent, fitted top and bottom'],
+  ['Choking hazard size','anything smaller than 3.17cm (1.25 in) diameter is a risk'],
+  ['Safe bath water temperature','around 37–38°C (98.6–100.4°F)'],
+  ['Safe handwashing water temperature','no higher than 37–38°C (98.6–100.4°F)'],
+  ['Infant sleep room temperature','16–20°C (61–68°F)'],
+  ['Car seat standard','UN R129 (i-Size) or applicable equivalent; rear-facing as long as possible'],
+  ['Pool/pond fence height','at least 1.2m (4ft) with a self-closing, self-latching gate'],
+  ['Balcony/railing gap','maximum 100mm (4 in) between balusters'],
+  ['Medication storage height','above 1.5m (5ft) or locked, in original labelled containers'],
+  ['Cleaning products/detergent pods','above 1.2m (4ft) or behind a child safety lock'],
+  ['Grapes and round fruit','quartered lengthwise before serving to a young child'],
+  ['Safe sleep position','back to sleep, firm flat surface, no loose bedding for infants'],
+  ['Furniture anti-tip anchoring','recommended for any unit taller than ~90cm (3ft)'],
+  ['Sunscreen reapplication','commonly every two hours, or after water play, in sun']
+];
+
+const CONTACTS_KEY = 'safelife-grandparentproofing-contacts';
+const DEFAULT_CONTACTS = [
+  ['Emergency services',''],
+  ['Child\'s parents (primary)',''],
+  ['Child\'s parents (secondary/other parent)',''],
+  ['Family doctor / GP',''],
+  ['Poison information / emergency medical advice',''],
+  ['Local pharmacy',''],
+  ['Trusted neighbour / backup adult',''],
+  ['Child\'s health professional / paediatrician','']
+];
+let contacts;
+try{
+  const raw = localStorage.getItem(CONTACTS_KEY);
+  contacts = raw ? JSON.parse(raw) : null;
+}catch(e){ contacts = null; }
+if(!contacts || !Array.isArray(contacts.list)) contacts = { list: DEFAULT_CONTACTS.map(c=>c.slice()), notes:'' };
+function saveContacts(){
+  try{ localStorage.setItem(CONTACTS_KEY, JSON.stringify(contacts)); }catch(e){}
+  buildCheatPrint();
+}
+function buildCheat(){
+  const body = document.getElementById('cheat-body');
+  const rules = GOLDEN_RULES.map(r=>'<li>' + r + '</li>').join('');
+  const nums = KEY_NUMBERS.map(n=>'<tr><td><strong>' + n[0] + '</strong></td><td>' + n[1] + '</td></tr>').join('');
+  body.innerHTML =
+    '<h4>📞 ' + t('cheatContacts') + '</h4>' +
+    '<p style="font-size:12px;color:var(--ink-soft);margin-bottom:8px;">' + t('cheatHint') + '</p>' +
+    '<div id="contact-rows"></div>' +
+    '<button class="btn btn-outline" id="add-contact" style="margin:8px 0 4px;">' + t('addContact') + '</button>' +
+    '<h4>⭐ ' + t('rules') + '</h4><ul class="rule-list">' + rules + '</ul>' +
+    '<h4>📏 ' + t('keyNums') + '</h4><table><tr><th>Check</th><th>Safe value / standard</th></tr>' + nums + '</table>' +
+    '<h4>📝 ' + t('myNotes') + '</h4>' +
+    '<textarea id="cheat-notes" placeholder="' + t('notesPh') + '" style="width:100%;min-height:80px;border:1px solid var(--line);border-radius:8px;background:var(--tile);color:var(--ink);padding:10px 12px;font-family:\'Inter\',sans-serif;font-size:13px;resize:vertical;"></textarea>';
+  renderContactRows();
+  const notesEl = document.getElementById('cheat-notes');
+  notesEl.value = contacts.notes || '';
+  notesEl.addEventListener('input', function(){ contacts.notes = this.value; saveContacts(); });
+  document.getElementById('add-contact').addEventListener('click', function(){
+    contacts.list.push(['','']);
+    renderContactRows(); saveContacts();
+    const rows = document.querySelectorAll('#contact-rows .c-name');
+    rows[rows.length-1].focus();
+  });
+  buildCheatPrint();
+}
+function renderContactRows(){
+  const wrap = document.getElementById('contact-rows');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  const inputCss = 'border:1px solid var(--line);border-radius:8px;background:var(--tile);color:var(--ink);padding:8px 10px;font-family:\'Inter\',sans-serif;font-size:13px;';
+  contacts.list.forEach((c, ix)=>{
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:6px;margin-bottom:6px;align-items:center;';
+    const name = document.createElement('input');
+    name.className = 'c-name'; name.type = 'text'; name.value = c[0];
+    name.placeholder = 'Name / service'; name.style.cssText = inputCss + 'flex:1.4;min-width:0;';
+    const num = document.createElement('input');
+    num.type = 'text'; num.value = c[1];
+    num.placeholder = '+ number'; num.style.cssText = inputCss + 'flex:1;min-width:0;font-weight:700;';
+    const del = document.createElement('button');
+    del.textContent = '✕'; del.title = t('delRow');
+    del.style.cssText = 'border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);border-radius:8px;width:30px;height:34px;cursor:pointer;flex-shrink:0;';
+    name.addEventListener('input', function(){ contacts.list[ix][0] = this.value; saveContacts(); });
+    num.addEventListener('input', function(){ contacts.list[ix][1] = this.value; saveContacts(); });
+    del.addEventListener('click', function(){ contacts.list.splice(ix,1); renderContactRows(); saveContacts(); });
+    row.append(name, num, del);
+    wrap.appendChild(row);
+  });
+}
+function buildCheatPrint(){
+  const esc = s => String(s).replace(/</g,'&lt;');
+  const filled = contacts.list.filter(c=>c[0] || c[1]);
+  const chips = filled.map(h=>'<div class="cp-chip"><b>' + esc(h[0]||'—') + '</b><span>' + (esc(h[1]) || '____________') + '</span></div>').join('');
+  const rules = GOLDEN_RULES.map(r=>'<li>' + r + '</li>').join('');
+  const nums = KEY_NUMBERS.map(n=>'<tr><td><strong>' + n[0] + '</strong></td><td>' + n[1] + '</td></tr>').join('');
+  const activeQR = getSavedQR() || QR_IMAGE;
+  const qr = activeQR
+    ? '<img src="' + activeQR + '" alt="QR">'
+    : '<div class="qr-ph">' + (STORE_URL ? esc(STORE_URL) : 'Your QR<br>code here') + '</div>';
+  document.getElementById('cheat-print').innerHTML =
+    '<div class="cp-card">' +
+      '<div class="cp-head">' + ICONS.stage +
+        '<div><div class="cp-title">Safe<em>Life</em></div>' +
+        '<div class="cp-sub">' + t('cheatTitle') + ' · ' + t('heroTitle') + '</div></div>' +
+        '<div class="cp-tag">"To all moms by a mom"<br>NEBOSH &amp; OSHA trained HSE professional</div>' +
+      '</div>' +
+      '<div class="cp-contacts">' + chips + '</div>' +
+      '<div class="cp-cols">' +
+        '<div class="cp-rules"><h3>⭐ ' + t('rules') + '</h3><ul>' + rules + '</ul></div>' +
+        '<div class="cp-numsec"><h3>📏 ' + t('keyNums') + '</h3><table>' + nums + '</table></div>' +
+      '</div>' +
+      (contacts.notes ? '<div class="cp-notes"><b>' + t('myNotes') + '</b>' + esc(contacts.notes) + '</div>' : '') +
+      '<div class="cp-foot">' +
+        '<div>Made with care by <b>' + BRAND_NAME + '</b> · SafeLife Collection<br>' + t('disclaimer') + '</div>' +
+        '<div class="cp-qr">' + (STORE_URL ? '<div style="font-size:8px;">' + esc(STORE_URL) + '<br>Scan for the full collection</div>' : '') + qr + '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+// ═══════════════════════════════════════════
+// SELLER: per-product QR code, PIN-protected (each file's own STORE_KEY keeps these separate)
+// ═══════════════════════════════════════════
+const QR_KEY = STORE_KEY + '-qr';
+const QR_PIN_KEY = STORE_KEY + '-qrpin';
+function getSavedQR(){ try{ return localStorage.getItem(QR_KEY) || ''; }catch(e){ return ''; } }
+function sellerRenderLocked(){
+  const hasPin = !!localStorage.getItem(QR_PIN_KEY);
+  document.getElementById('seller-body').innerHTML = hasPin
+    ? '<p>Enter your PIN to manage this file\'s QR code.</p><input type="password" inputmode="numeric" maxlength="12" id="seller-pin-input" placeholder="PIN" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--tile);color:var(--ink);font-size:15px;letter-spacing:2px;margin-bottom:10px;">'
+      + '<div class="modal-actions"><button class="btn btn-primary" id="seller-unlock">Unlock</button></div>'
+    : '<p>No PIN set yet for this file. Create one now — you\'ll need it to change the QR code later. Every product file keeps its own separate PIN and QR code.</p>'
+      + '<input type="password" inputmode="numeric" maxlength="12" id="seller-pin-new" placeholder="Create a PIN" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--tile);color:var(--ink);font-size:15px;letter-spacing:2px;margin-bottom:8px;">'
+      + '<input type="password" inputmode="numeric" maxlength="12" id="seller-pin-confirm" placeholder="Confirm PIN" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--tile);color:var(--ink);font-size:15px;letter-spacing:2px;margin-bottom:10px;">'
+      + '<div class="modal-actions"><button class="btn btn-primary" id="seller-setpin">Set PIN</button></div>';
+  if(hasPin){
+    document.getElementById('seller-unlock').addEventListener('click', function(){
+      const val = document.getElementById('seller-pin-input').value;
+      if(val && val === localStorage.getItem(QR_PIN_KEY)) sellerRenderUnlocked();
+      else alert('Incorrect PIN.');
+    });
+  } else {
+    document.getElementById('seller-setpin').addEventListener('click', function(){
+      const a = document.getElementById('seller-pin-new').value, b = document.getElementById('seller-pin-confirm').value;
+      if(!a || a.length < 4){ alert('Use at least 4 digits.'); return; }
+      if(a !== b){ alert('PINs do not match.'); return; }
+      try{ localStorage.setItem(QR_PIN_KEY, a); }catch(e){}
+      sellerRenderUnlocked();
+    });
+  }
+}
+function sellerRenderUnlocked(){
+  const current = getSavedQR();
+  document.getElementById('seller-body').innerHTML =
+    '<p>Upload this product\'s QR code image. It replaces the placeholder on the printed cheat sheet — saved on this device only, separately for every product file.</p>' +
+    (current ? '<img src="' + current + '" style="width:110px;height:110px;border:1px solid var(--line);border-radius:9px;margin-bottom:10px;object-fit:contain;background:#fff;">' : '') +
+    '<input type="file" accept="image/*" id="seller-qr-file" style="margin-bottom:10px;">' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-outline" id="seller-remove-qr">Remove QR</button>' +
+      '<button class="btn btn-outline" id="seller-change-pin">Change PIN</button>' +
+      '<button class="btn btn-primary" id="seller-done">Done</button>' +
+    '</div>';
+  document.getElementById('seller-qr-file').addEventListener('change', function(e){
+    const file = e.target.files && e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      try{ localStorage.setItem(QR_KEY, ev.target.result); }catch(e){}
+      buildCheatPrint();
+      sellerRenderUnlocked();
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('seller-remove-qr').addEventListener('click', function(){
+    try{ localStorage.removeItem(QR_KEY); }catch(e){}
+    buildCheatPrint();
+    sellerRenderUnlocked();
+  });
+  document.getElementById('seller-change-pin').addEventListener('click', function(){
+    try{ localStorage.removeItem(QR_PIN_KEY); }catch(e){}
+    sellerRenderLocked();
+  });
+  document.getElementById('seller-done').addEventListener('click', ()=>closeModal('modal-seller'));
+}
+document.getElementById('btn-seller').addEventListener('click', function(){ sellerRenderLocked(); openModal('modal-seller'); });
+
+const MODULES = [
+  {a:'0–28 Days'},
+  {a:'1–12 Months'},
+  {a:'1–3 Years'},
+  {a:'3–6 Years'},
+  {a:'6–12 Years'},
+  {a:'13–18 Years'},
+  {a:'19–29 Years'},
+  {a:'30–44 Years'},
+  {a:'45–64 Years'},
+  {a:'65–79 Years'},
+  {a:'80–89 Years'},
+  {a:'90+ Years'}
+];
+const MODULE_ICON_IX = [0,0,1,2,3,4,5,6,6,7,7,7];
+const SITUATION_MODULES = [
+  {name:'Pregnancy', sub:'Stage 0', status:'available', emoji:'🤰'},
+  {name:'Postpartum Recovery', sub:'Situation Module', status:'available', emoji:'🌷'},
+  {name:'Grandparent-Proofing', sub:'Situation Module', status:'current', emoji:'👵'},
+  {name:'Autism & Neurodivergent Children', sub:'Situation Module', status:'available', emoji:'♾️'},
+  {name:'Emergency Preparedness', sub:'Situation Module', status:'available', emoji:'🧳'},
+  {name:'Twins & Multiples', sub:'Situation Module', status:'available', emoji:'👯'},
+  {name:'Babysitter/Nanny Handover', sub:'Situation Module', status:'available', emoji:'🗒️'},
+  {name:'Dementia & Alzheimer\'s Care', sub:'Situation Module', status:'available', emoji:'🏠'},
+  {name:'Injury & Post-Surgery Recovery', sub:'Coming Soon', status:'available', emoji:'🩹'},
+  {name:'Chronic Conditions Household', sub:'Coming Soon', status:'available', emoji:'💊'},
+  {name:'Limited Mobility / Wheelchair', sub:'Coming Soon', status:'available', emoji:'♿'},
+  {name:'Visually / Hearing Impaired', sub:'Situation Module', status:'available', emoji:'🔔'},
+  {name:'New Pet + Baby Household', sub:'Coming Soon', status:'coming', emoji:'🐾'},
+  {name:'The Caregiver\'s Own Safety', sub:'Coming Soon', status:'coming', emoji:'🤲'},
+  {name:'New Home Move-In Audit', sub:'Coming Soon', status:'coming', emoji:'🏠'},
+  {name:'Farm & Rural Household', sub:'Coming Soon', status:'coming', emoji:'🚜'},
+  {name:'Home Office / WFH', sub:'Coming Soon', status:'coming', emoji:'💻'}
+];
+function buildSituationGrid(){
+  const grid = document.getElementById('situation-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  SITUATION_MODULES.forEach(m=>{
+    const card = document.createElement('div');
+    card.className = 'module-card';
+    const tagClass = m.status === 'coming' ? 'coming' : (m.status === 'current' ? 'owned' : 'addon');
+    const tagLabel = m.status === 'coming' ? 'Coming Soon' : (m.status === 'current' ? '✓ Current Module' : 'Available Separately');
+    card.innerHTML = '<span class="m-emoji">' + m.emoji + '</span><span class="m-name">' + m.name + '</span><span class="m-age">' + m.sub + '</span>' +
+      '<span class="module-tag ' + tagClass + '">' + tagLabel + '</span>';
+    grid.appendChild(card);
+  });
+}
+
+function buildCollection(){
+  const grid = document.getElementById('collection-grid');
+  grid.innerHTML = '';
+  MODULES.forEach((m, mi)=>{
+    const card = document.createElement('div');
+    card.className = 'module-card';
+    const iconIx = MODULE_ICON_IX[mi] != null ? MODULE_ICON_IX[mi] : mi;
+    card.innerHTML = '<span class="m-emoji">' + ICONS.stages[iconIx] + '</span><span class="m-name">' + t('mn'+(mi+1)) + '</span><span class="m-age">' + m.a + '</span>' +
+      '<span class="module-tag ' + (m.owned ? 'owned' : 'addon') + '">' + (m.owned ? t('owned') : t('addon')) + '</span>';
+    grid.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+restore();
+injectIcons();
+document.body.dataset.theme = theme;
+document.body.dataset.mode = mode;
+document.getElementById('btn-mode').textContent = mode === 'light' ? '🌙' : '☀️';
+applyLang();
+fillStats();
+renderAll();
+buildThemeMenu();
+buildLangMenu();
+buildManual();
+buildCheat();
+buildCollection();
+buildSituationGrid();
+</script>
+</body>
+</html>
